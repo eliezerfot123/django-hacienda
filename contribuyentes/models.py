@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 class Rubros(models.Model):
     codigo=models.IntegerField()
-    rubro=models.CharField(max_length=100)
+    rubro=models.CharField(max_length=500)
     alicuota=models.FloatField()
     ut=models.IntegerField()
     def __unicode__(self):
