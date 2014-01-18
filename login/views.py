@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.views import login
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
+from django.http import HttpResponse, HttpResponseRedirect
 
 @csrf_protect
 def home(request):
@@ -13,8 +14,7 @@ def home(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             if user.is_active:
-                login(request, user)
-                #cuenta activa ir a su perfil
+                return HttpResponseRedirect('/sdr/')
             else:
                 c = {}
                 c.update(csrf(request))
