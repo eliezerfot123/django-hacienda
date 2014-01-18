@@ -1,3 +1,4 @@
 hacienda/local.conf
 *.sw*
 *.pyc
+*.csv
