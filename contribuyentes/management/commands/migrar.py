@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
-from contribuyentes.models import Rubros
+from contribuyentes.models import *
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--rubro',
@@ -8,29 +8,72 @@ class Command(BaseCommand):
             nargs=1, 
             dest='rubro',
             help='Importa rubros'),
-        )
-    def _abrir_archivo(self,nombre):
+        make_option('--contrib',action='store',nargs=1,dest='contrib',help='Importar contribuyentes'))
+    def __abrir_archivo(self,nombre):
         import csv
         try:
-            return csv.reader(open(nombre,'rb'), delimiter=',',quotechar='"')
+            return csv.reader(open(nombre,'r'), delimiter=',',quotechar='"')
         except IOError:
             raise CommandError('Archivo no existe' )
+    
+    def __rubro(self,archivo):
+        next(archivo)
+        for linea in archivo:
+            rubro=Rubro.objects.filter(codigo=linea[1])
+            if not rubro.exists():
+                print (linea)
+                if linea[3] is not '':
+                    alicuota=float(linea[3].replace(',','.'))
+                else:
+                    alicuota=0
+                Rubro(codigo=linea[1],rubro=linea[2],alicuota=alicuota,ut=linea[4]).save()
+        self.stdout.write('Successfully closed poll' )
+
+    def __contribuyente(self,archivo):
+        import pdb 
+        pdb.set_trace()
+        next(archivo)
+        for linea in archivo:
+            print (linea)
+            if linea[1]=="J-867312-0":
+                pdb.set_trace()
+
+            if not Contribuyente.objects.filter(num_identificacion=linea[1]).exists():
+                if linea[7]=='':
+                    linea[7]=0.0
+                else:
+                    linea[7]=linea[7].replace(',','.')
+                fecha=linea[13].split('/')
+                linea[13]=fecha[2]+"-"+fecha[1]+"-"+fecha[0]
+
+
+                contribuyente=Contribuyente(id_contrato=linea[0],num_identificacion=linea[1],nombre=linea[2],telf=linea[3],fax=linea[4],representante=linea[5],cedula_rep=linea[6],capital=linea[7],direccion=linea[11],modificado=linea[13])
+                contribuyente.save()
+                if linea[12] !='' and 'DESINCOR' not in linea[12] and 'desincor' not in linea[12] and 'INACTIV' not in linea[12] and 'INHABILITAD' not in linea[12]:
+                    for rubros in linea[12].split('-'):
+
+                        rubro=Rubro.objects.filter(codigo=rubros)
+                        if rubro.exists():
+                            rubro=rubro[0]
+                            contribuyente.rubro.add(rubro)
+
+
+            
+            else:
+                print ("Contribuyente ya existe",linea[1])
 
     def handle(self, *args, **options):
-        if options['rubro']<> '':
+        if options['rubro']is not None:
             nombre=options['rubro']
-            archivo=self._abrir_archivo(nombre)
-            archivo.next()
-            for linea in archivo:
-                rubro=Rubros.objects.filter(codigo=linea[1])
-                if not rubro.exists():
-                    print linea
-                    if linea[3]<>'':
-                        alicuota=float(linea[3].replace(',','.'))
-                    else:
-                        alicuota=0
-                    Rubros(codigo=linea[1],rubro=linea[2],alicuota=alicuota,ut=linea[4]).save()
+            archivo=self.__abrir_archivo(nombre)
+            self.__rubro(archivo)
+        elif options['contrib']is not None: 
+            
+            nombre=options['contrib']
+            archivo=self.__abrir_archivo(nombre)
+            self.__contribuyente(archivo)
+            
 
 
 
-            self.stdout.write('Successfully closed poll' )
+
