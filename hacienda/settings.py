@@ -95,5 +95,5 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
     'django.template.loaders.eggs.Loader',
 )
-
-execfile(os.path.join(BASE_DIR,'hacienda','local.conf'))
+local=os.path.join(BASE_DIR,'hacienda','local.conf')
+exec(compile(open(local,'r').read(),local,'exec'))
