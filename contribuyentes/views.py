@@ -3,9 +3,21 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from contribuyentes.models import *
 from django.template.context import RequestContext
+from django.db.models import Q
 
 def lista_contribuyentes(request):
-    contrib = Contribuyente.objects.all().order_by('-nombre')
-    return render(request, 'lista_contribuyentes.html', {'contribuyentes':contrib}, 
-    	context_instance = RequestContext(request))
+	if request.method == 'GET':
+		contribuyente = request.GET.get('contrib')
+		if contribuyente is not None:
+			contrib_filters = Contribuyente.objects.filter(
+				Q(id_contrato=int(contribuyente)) | Q(num_identificacion__startswith=contribuyente) |
+				Q(nombre__startswith=contribuyente) | Q(telf__startswith=contribuyente) |
+				Q(email__startswith=contribuyente) | Q(representante__startswith=contribuyente) |
+				Q(cedula_rep__startswith=contribuyente)).order_by('-nombre')
 
+			return render(request, 'lista_contribuyentes.html', {'contrib_filters':contrib_filters},
+				context_instance = RequestContext(request))
+		else:
+			return render(request, 'lista_contribuyentes.html')
+    
+	return render(request, 'lista_contribuyentes.html')

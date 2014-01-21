@@ -614,7 +614,28 @@
 						</h1>
 					</div><!--/.page-header-->
 
-					<div class="row-fluid">
+                            <div class="span4">
+                               <div class="row-fluid">
+                                    <div class="widget-box">
+                                        <div class="widget-header widget-header-small">
+                                            <h5 class="lighter">Buscar Contribuyentes</h5>
+                                        </div>
+
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <form class="form-search" id="buscar_contrib" action="/sdr/" />
+                                                    <input name="contrib" placeholder="Ej: Cedula, Nombre, Rubro" type="text" class="input-medium search-query" />
+                                                    <button class="btn btn-purple btn-small" type="submit">
+                                                            Buscar
+                                                        <i class="icon-search icon-on-right bigger-110"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
 						<div class="span12">
 							<!--PAGE CONTENT BEGINS-->
 							<div class="row-fluid">
@@ -646,7 +667,8 @@
 									</thead>
 
 									<tbody>
-										{% for contrib in contribuyentes %}
+                                    {% if contrib_filters %}
+										{% for contrib in contrib_filters %}
 											<tr>
 												<td class="center">
 												    <label>
@@ -720,6 +742,7 @@
 											    </td>
 											</tr>
 										{% endfor %}
+                                    {% endif %}
 									</tbody>
 								</table>
 							</div>
