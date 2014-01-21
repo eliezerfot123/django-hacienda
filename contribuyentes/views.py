@@ -10,9 +10,9 @@ def lista_contribuyentes(request):
 		contribuyente = request.GET.get('contrib')
 		if contribuyente is not None:
 			contrib_filters = Contribuyente.objects.filter(
-				Q(id_contrato=int(contribuyente)) | Q(num_identificacion__startswith=contribuyente) |
-				Q(nombre__startswith=contribuyente) | Q(telf__startswith=contribuyente) |
-				Q(email__startswith=contribuyente) | Q(representante__startswith=contribuyente) |
+				Q(id_contrato__icontains=contribuyente) | Q(num_identificacion__startswith=contribuyente) |
+				Q(nombre__icontains=contribuyente) | Q(telf__startswith=contribuyente) |
+				Q(email__icontains=contribuyente) | Q(representante__icontains=contribuyente) |
 				Q(cedula_rep__startswith=contribuyente)).order_by('-nombre')
 
 			return render(request, 'lista_contribuyentes.html', {'contrib_filters':contrib_filters},
