@@ -30,27 +30,32 @@ class Command(BaseCommand):
         self.stdout.write('Successfully closed poll' )
 
     def __contribuyente(self,archivo):
-        import pdb 
-        pdb.set_trace()
+        #for n in range(24000):
         next(archivo)
         for linea in archivo:
             print (linea)
-            if linea[1]=="J-867312-0":
-                pdb.set_trace()
 
             if not Contribuyente.objects.filter(num_identificacion=linea[1]).exists():
                 if linea[7]=='':
                     linea[7]=0.0
                 else:
                     linea[7]=linea[7].replace(',','.')
+                    if linea[7][-3:]=='.00':
+                        linea[7]=linea[7][:-3] 
+                    if linea[7].find('MENOS')-1:
+                        linea[7]='999'
                 fecha=linea[13].split('/')
                 linea[13]=fecha[2]+"-"+fecha[1]+"-"+fecha[0]
 
 
                 contribuyente=Contribuyente(id_contrato=linea[0],num_identificacion=linea[1],nombre=linea[2],telf=linea[3],fax=linea[4],representante=linea[5],cedula_rep=linea[6],capital=linea[7],direccion=linea[11],modificado=linea[13])
                 contribuyente.save()
-                if linea[12] !='' and 'DESINCOR' not in linea[12] and 'desincor' not in linea[12] and 'INACTIV' not in linea[12] and 'INHABILITAD' not in linea[12]:
-                    for rubros in linea[12].split('-'):
+                if linea[12] !='' and 'DESINCOR' not in linea[12] and 'desincor' not in linea[12] and 'INACTIV' not in linea[12] and 'INHABILITAD' not in linea[12] and 'AGENTE' not in linea[12]:
+                    sep='-'
+                    if len(linea[12].split(','))>1:
+                        sep=','
+
+                    for rubros in linea[12].split(sep):
 
                         rubro=Rubro.objects.filter(codigo=rubros)
                         if rubro.exists():
