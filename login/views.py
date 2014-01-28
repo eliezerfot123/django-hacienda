@@ -13,6 +13,7 @@ def home(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             if user.is_active:
+                login(request, user)
                 c = {}
                 c.update(csrf(request))
                 c.update({'usuario':user.get_username()})

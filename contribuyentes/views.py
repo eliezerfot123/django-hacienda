@@ -5,6 +5,7 @@ from django.template.context import RequestContext
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 
+@login_required()
 def lista_contribuyentes(request):
 	if request.method == 'GET':
 		contribuyente = request.GET.get('contrib')
