@@ -27,3 +27,8 @@ class Contribuyente(models.Model):
         return '%s %s %s'%(self.num_identificacion,self.nombre,self.representante)
 
 
+"""class Licencia(models.Model):
+    serial=models.CharField(max_length=20)
+    control=models.CharField(max_length=20)
+    numero=models.CharField()
+"""
