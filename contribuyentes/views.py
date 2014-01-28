@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
 from contribuyentes.models import *
 from django.template.context import RequestContext
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 def lista_contribuyentes(request):
 	if request.method == 'GET':
@@ -19,5 +19,5 @@ def lista_contribuyentes(request):
 				context_instance = RequestContext(request))
 		else:
 			return render(request, 'lista_contribuyentes.html')
-    
+
 	return render(request, 'lista_contribuyentes.html')
