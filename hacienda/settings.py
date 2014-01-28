@@ -94,12 +94,18 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
     'django.template.loaders.eggs.Loader',
 )
-
+DATABASES = {
+    'default': {
+    }
+}
 import dj_database_url
 DATABASES['default'] = dj_database_url.config()
 
 local = os.path.join(BASE_DIR, 'hacienda', 'local.conf')
-exec(compile(open(local, 'r').read(), local, 'exec'))
+try:
+    exec(compile(open(local, 'r').read(), local, 'exec'))
+except IOError:
+    pass
 
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
