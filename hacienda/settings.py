@@ -95,11 +95,12 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.eggs.Loader',
 )
 
+import dj_database_url
+DATABASES['default'] = dj_database_url.config()
+
 local = os.path.join(BASE_DIR, 'hacienda', 'local.conf')
 exec(compile(open(local, 'r').read(), local, 'exec'))
 
-import dj_database_url
-DATABASES['default'] = dj_database_url.config()
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
