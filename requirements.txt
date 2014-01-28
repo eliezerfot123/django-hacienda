@@ -1,0 +1,9 @@
+Django==1.6.1
+chardet==2.0.1
+decorator==3.3.3
+ipython==0.13.1
+psycopg2==2.4.5
+pyzmq==2.2.0
+simplegeneric==0.8.1
+tornado==2.3
+wsgiref==0.1.2
