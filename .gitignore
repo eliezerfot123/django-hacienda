@@ -2,3 +2,5 @@ hacienda/local.conf
 *.sw*
 *.pyc
 *.csv
+hacienda/static/admin/*
+hacienda/static/assets/*
