@@ -12,6 +12,7 @@ class Command(BaseCommand):
         make_option('--contrib',action='store',nargs=1,dest='contrib',help='Importar contribuyentes'),
         make_option('--contriblic',action='store',nargs=1,dest='contriblic',help='Importar contribuyentes_LIC'),
         make_option('--liquidacion',action='store',nargs=1,dest='liquidacion',help='Importar liquidaciones'),
+        make_option('--licencia',action='store',nargs=1,dest='licencia',help='Importar licencia'),
         
         )
     def __abrir_archivo(self,nombre):
@@ -36,7 +37,7 @@ class Command(BaseCommand):
 
     def __contribuyentelic(self,archivo):
         #for n in range(24000):
-        next(archivo)
+        #next(archivo)
         for linea in archivo:
             print (linea)
             if not Contribuyente.objects.filter(num_identificacion=linea[2]).exists():
@@ -44,16 +45,17 @@ class Command(BaseCommand):
                 contribuyente=Contribuyente(id_contrato=linea[1],num_identificacion=linea[2],nombre=linea[3],telf=linea[4],fax=linea[5],representante=linea[6],cedula_rep=linea[7],capital=linea[8],direccion=linea[12],modificado=linea[14])
                 contribuyente.save()
                 sep='-'
-                if len(linea[13].split(','))>1:
-                    sep=','
+                if linea[13] !='' and 'DESINCOR' not in linea[13] and 'desincor' not in linea[13] and 'INACTIV' not in linea[13] and 'INHABILITAD' not in linea[13] and 'AGENTE' not in linea[13]:
+                    if len(linea[13].split(','))>1:
+                        sep=','
 
-                for rubros in linea[13].split(sep):
-                    rubro=Rubro.objects.filter(codigo=rubros)
-                    if rubro.exists():
-                        rubro=rubro[0]
-                        contribuyente.rubro.add(rubro)
-                    else:
-                        print ("RUBRO NO EXISTE!",rubros)
+                    for rubros in linea[13].split(sep):
+                        rubro=Rubro.objects.filter(codigo=rubros)
+                        if rubro.exists():
+                            rubro=rubro[0]
+                            contribuyente.rubro.add(rubro)
+                        else:
+                            print ("RUBRO NO EXISTE!",rubros)
             else:
                 print ("EXISTE")
 
@@ -72,6 +74,31 @@ class Command(BaseCommand):
                 liq=Liquidacion(numero=linea[0],trimestre=linea[1],ano=linea[2],monto=linea[3],recargo=linea[4],intereses=linea[5],impuesto=impuesto,emision=linea[7])
                 liq.save()
                 print (liq.numero)
+
+    def __licencia(self,archivo):
+        #for n in range(3400):
+            next(archivo)
+        for linea in archivo:
+            print (linea)
+            contrib=Contribuyente.objects.filter(num_identificacion=linea[8])
+
+            if contrib.exists():
+                if not Licencia.objects.filter(serial=linea[0]).exists():
+                    if linea[3] is '': linea[3]=0
+                    if linea[4] is '': linea[4]=linea[5]
+
+                    fecha=linea[4].split('/')
+                    linea[4]=fecha[2]+"-"+fecha[1]+"-"+fecha[0]
+                    fecha=linea[5].split('/')
+                    linea[5]=fecha[2]+"-"+fecha[1]+"-"+fecha[0]
+                    Licencia(serial=linea[0],control=linea[1],numero=linea[2],cantidad=linea[3],emision=linea[4],valido=linea[5],campoid=linea[6]).save()
+
+
+
+
+            else:
+                print (linea)
+                print ("No existe contribuyente ",linea[8])
 
     def __contribuyente(self,archivo):
         #for n in range(24000):
@@ -111,6 +138,7 @@ class Command(BaseCommand):
             else:
                 print ("Contribuyente ya existe",linea[1])
 
+
     def handle(self, *args, **options):
         if options['rubro']is not None:
             nombre=options['rubro']
@@ -129,6 +157,10 @@ class Command(BaseCommand):
             nombre=options['liquidacion']
             archivo=self.__abrir_archivo(nombre)
             self.__liquidacion(archivo)
+        elif options['licencia']is not None: 
+            nombre=options['licencia']
+            archivo=self.__abrir_archivo(nombre)
+            self.__licencia(archivo)
             
 
 

@@ -1,4 +1,5 @@
 from django.db import models
+from liquidaciones.models import Liquidacion 
 
 # Create your models here.
 class Rubro(models.Model):
@@ -8,6 +9,15 @@ class Rubro(models.Model):
     ut=models.IntegerField()
     def __unicode__(self):
         return '%d %s (%d UT)'%(self.codigo,self.rubro,self.ut)
+
+class Licencia(models.Model):
+    serial=models.CharField(max_length=20)
+    control=models.CharField(max_length=20)
+    numero=models.CharField(max_length=20)
+    cantidad=models.IntegerField(null=True,blank=True)
+    emision=models.DateField()
+    valido=models.DateField()
+    campoid=models.IntegerField(null=True,blank=True)
 
 class Contribuyente(models.Model):
     id_contrato=models.IntegerField()
@@ -27,8 +37,13 @@ class Contribuyente(models.Model):
         return '%s %s %s'%(self.num_identificacion,self.nombre,self.representante)
 
 
-"""class Licencia(models.Model):
-    serial=models.CharField(max_length=20)
-    control=models.CharField(max_length=20)
-    numero=models.CharField()
-"""
+    def licencias(self,):
+        return Licencia.object.filter(contribuyente=self.pk)
+
+    def liquidaciones(self):
+        return Liquidacion.objects.filter(contribuyente=self.pk)
+
+
+
+
+
