@@ -3,29 +3,13 @@ import datetime
 from django.conf import settings
 from django.http import HttpResponse
 
-from reportlab.platypus import SimpleDocTemplate, BaseDocTemplate, PageTemplate
-from reportlab.platypus import Spacer, Paragraph, Table, TableStyle, Frame, Image
-from reportlab.pdfgen import canvas
-from reportlab.graphics.shapes import Drawing
+from reportlab.platypus import SimpleDocTemplate
+from reportlab.platypus import Spacer, Paragraph, Table, TableStyle, Image
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import inch, cm, mm
+from reportlab.lib.units import cm
 from reportlab.lib import colors
-
-PAGE_HEIGHT = 29.7*cm
-PAGE_WIDTH = 21*cm
-
-def cabecera_licencias(canvas, doc):
-    canvas.saveState()
-    #canvas.drawImage(settings.STATIC_ROOT+'reportes/unerg.jpg', 2.6*cm, PAGE_HEIGHT-4.5*cm, width = 100, height = 38)
-    canvas.setFont("Helvetica-Bold",9)
-    canvas.drawCentredString(PAGE_WIDTH-9.5*cm, PAGE_HEIGHT-3.6*cm, u'República Bolivariana de Venezuela')
-    canvas.drawCentredString(PAGE_WIDTH-9.5*cm, PAGE_HEIGHT-4.0*cm, u'Estado Cojedes')
-    canvas.drawCentredString(PAGE_WIDTH-9.5*cm, PAGE_HEIGHT-4.4*cm, u'Alcaldía del Municipio Ezequiel Zamora')
-    canvas.drawCentredString(PAGE_WIDTH-9.5*cm, PAGE_HEIGHT-4.8*cm, u'Dirección de Rentas Municipales')
-    canvas.restoreState()
-    canvas.saveState()
 
 
 def licencia_expendio_alcohol(request):
@@ -183,7 +167,7 @@ def licencia_expendio_alcohol(request):
     #---> Fin Notas <---
 
     #---> Firmas <---
-    elementos.append(Spacer(1, 20))
+    elementos.append(Spacer(1, 10))
     y = [
         ('GRID', (0, 0), (-1, -1), 0.50, colors.black),
     ]
@@ -203,6 +187,54 @@ def licencia_expendio_alcohol(request):
     t2.setStyle(TableStyle(y))
     elementos.append(t2)
     #---> Fin Firmas <---
+
+    #---> Tabla3 autorizacion <---
+    elementos.append(Spacer(1, 10))
+    estilo_tabla3 = styleSheet['BodyText']
+    estilo_tabla3.alignment = TA_LEFT
+    z = [
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('GRID', (0, 0), (-1, -1), 0.80, colors.black),
+        ('FONT', (0, 0), (3, 0), "Helvetica-Bold", 12),
+        ('FONT', (0, 0), (-1, -1), "Helvetica", 8),
+        ('SPAN', (0, 0), (3, 0)),
+        ('ALIGN', (0, 0), (3, 0), 'CENTER'),
+    ]
+    tabla3 = []
+
+    # Headers de la tabla3
+    aNombre = Paragraph('NOMBRE O RAZÓN SOCIAL:<br /><br /> ', estilo_tabla3)
+    z.append(('SPAN', (0, 1), (1, 1))),
+
+    aAutorizacion = Paragraph('N° DE AUTORIZACION:<br /><br /> ', estilo_tabla3)
+    z.append(('SPAN', (2, 1), (3, 1))),
+
+    aLicencia = Paragraph('N° DE LICENCIA:<br /><br /> ', estilo_tabla3)
+
+    aRif = Paragraph('R.I.F.', estilo_tabla3)
+    z.append(('SPAN', (2, 2), (3, 2))),
+
+    aDireccion = Paragraph('DIRECCION DEL ESTABLECIMIENTO:' +
+                           '<br /><br /><br /><br />', estilo_tabla3)
+    # (col,fila, col,fila)
+    z.append(('SPAN', (1, 3), (0, 2))),
+    z.append(('VALIGN', (1, 2), (0, 2), 'TOP')),
+
+    tabla3.append(['AUTORIZACION PARA EL EXPENDIO DE ALCOHOL ' +
+                    'Y ESPECIES ALCOHOLICAS'])
+    tabla3.append([aNombre, '', aAutorizacion])
+    tabla3.append([aDireccion, '', aRif])
+    tabla3.append(['', '', aLicencia])
+    tabla3.append(['ENTREGADO POR:\n ', '', 'C.I.\n ', 'ID:\n '])
+    z.append(('SPAN', (1, 4), (0, 4))),
+    tabla3.append(['RECIBIDO POR:\n ', '', 'C.I.\n ', 'LIQUIDACION:\n '])
+    z.append(('SPAN', (1, 5), (0, 5))),
+    tabla3.append(['FECHA:\n ', 'HORA:\n ', 'FIRMA:\n ', 'VENCIMIENTO:\n '])
+
+    t3 = Table(tabla3, colWidths=(5.0*cm, 5.0*cm, 4.5*cm, 4.5*cm))
+    t3.setStyle(TableStyle(z))
+    elementos.append(t3)
+    #---> Fin tabla3 autorizacion <---
 
     doc.build(elementos)
 
