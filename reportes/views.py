@@ -38,10 +38,10 @@ def licencia_expendio_alcohol(request):
     elementos.append(logo)
 
     elementos.append(Spacer(1, -50))
-    txtEncabezado = u'República Bolivariana de Venezuela'
-    txtEncabezado += u'<br />Estado Cojedes'
-    txtEncabezado += u'<br />Alcaldía del Municipio San Carlos'
-    txtEncabezado += u'<br />Dirección de Rentas Municipales'
+    txtEncabezado = 'República Bolivariana de Venezuela'
+    txtEncabezado += '<br />Estado Cojedes'
+    txtEncabezado += '<br />Alcaldía del Municipio San Carlos'
+    txtEncabezado += '<br />Dirección de Rentas Municipales'
     encabezado = Paragraph(txtEncabezado, cabecera)
     elementos.append(encabezado)
     #---> Fin Encabezado <---
@@ -56,10 +56,10 @@ def licencia_expendio_alcohol(request):
     estilo_fechas.leading = 15
 
     elementos.append(Spacer(1, -40))
-    txtFechas = u'Fecha de Solicitud: '
-    txtFechas += u'<br />Valido Hasta: '
-    txtFechas += u'<br />N° de Solicitud: '
-    txtFechas += u'<br />N° de Autorización: '
+    txtFechas = 'Fecha de Solicitud: '
+    txtFechas += '<br />Valido Hasta: '
+    txtFechas += '<br />N° de Solicitud: '
+    txtFechas += '<br />N° de Autorización: '
     texto_fechas = Paragraph(txtFechas, estilo_fechas)
     elementos.append(texto_fechas)
     #---> Fin Fechas <---
@@ -70,7 +70,7 @@ def licencia_expendio_alcohol(request):
     estilo_titulo.fontSize = 18
     estilo_titulo.fontName = 'Helvetica-Bold'
 
-    txtTitulo = u'AUTORIZACION PARA EL EXPENDIO DE ALCOHOL Y ESPECIES ALCOHOLICAS'
+    txtTitulo = 'AUTORIZACION PARA EL EXPENDIO DE ALCOHOL Y ESPECIES ALCOHOLICAS'
     texto_titulo = Paragraph(txtTitulo, estilo_titulo)
     elementos.append(texto_titulo)
     #---> Fin Titulo <---
@@ -94,24 +94,32 @@ def licencia_expendio_alcohol(request):
     hdatos = Paragraph('<b>DATOS PERSONALES</b>', estilo_tabla)
     hdatosBancario = Paragraph('<b>DATOS BANCARIOS</b>', estilo_tabla)
 
-    nombre = Paragraph('NOMBRE O RAZÓN SOCIAL:<br />.', estilo_tabla)
-    licencia = Paragraph('N° DE LICENCIA:<br />.', estilo_tabla)
-    rif = Paragraph('R.I.F.:<br />.', estilo_tabla)
-    representante = Paragraph('REPRESENTANTE LEGAL:<br />.', estilo_tabla)
-    cedula = Paragraph('C.I.:<br />.', estilo_tabla)
-    ID = Paragraph('ID:<br />.', estilo_tabla)
-    direccion = Paragraph('DIRECCION DEL ESTABLECIMIENTO:<br />.', estilo_tabla)
-    municipio = Paragraph('MUNICIPIO:<br />.', estilo_tabla)
-    estado = Paragraph('ESTADO:<br />.', estilo_tabla)
-    fechaPago = Paragraph('FECHA DE PAGO:<br />.', estilo_tabla)
-    banco = Paragraph('ENTIDAD BANCARIA:<br />.', estilo_tabla)
-    sucursal = Paragraph('SUCURSAL:<br />.', estilo_tabla)
-    numero = Paragraph('NÚMERO:<br />.', estilo_tabla)
-    monto = Paragraph('MONTO (Bs.):<br />.', estilo_tabla)
-    liquidacion = Paragraph('LIQUIDACIÓN:<br />.', estilo_tabla)
-    expendio = Paragraph('CLASIFICACIÓN DE EXPENDIO:<br />.', estilo_tabla)
-    horario = Paragraph('HORARIO:<br />.', estilo_tabla)
-    horarioExtendido = Paragraph('HORARIO EXTENDIDO:<br />.', estilo_tabla)
+    nombre = Paragraph('NOMBRE O RAZÓN SOCIAL:<br /><br /> ', estilo_tabla)
+    licencia = Paragraph('N° DE LICENCIA:<br /><br /> ', estilo_tabla)
+    rif = Paragraph('R.I.F.:<br /><br /> ', estilo_tabla)
+    representante = Paragraph('REPRESENTANTE LEGAL:<br /><br /> ', estilo_tabla)
+    cedula = Paragraph('C.I.:<br /><br /> ', estilo_tabla)
+    ID = Paragraph('ID:<br /><br /> ', estilo_tabla)
+    direccion = Paragraph('DIRECCION DEL ESTABLECIMIENTO:<br /><br /> ', estilo_tabla)
+    municipio = Paragraph('MUNICIPIO:<br /><br /> ', estilo_tabla)
+    estado = Paragraph('ESTADO:<br /><br /> ', estilo_tabla)
+    fechaPago = Paragraph('FECHA DE PAGO:<br /><br /> ', estilo_tabla)
+    banco = Paragraph('ENTIDAD BANCARIA:<br /><br /> ', estilo_tabla)
+
+    sucursal = Paragraph('SUCURSAL:<br /><br /> ', estilo_tabla)
+    x.append(('SPAN', (2, 6), (3, 6))), # Extendiendo columna sucursal
+
+    numero = Paragraph('NÚMERO:<br /><br /> ', estilo_tabla)
+    monto = Paragraph('MONTO (Bs.):<br /><br /> ', estilo_tabla)
+
+    liquidacion = Paragraph('LIQUIDACIÓN:<br /><br /> ', estilo_tabla)
+    x.append(('SPAN', (2, 7), (3, 7))), # Extendiendo columna liquidacion
+
+    expendio = Paragraph('CLASIFICACIÓN DE EXPENDIO:<br /><br /> ', estilo_tabla)
+    horario = Paragraph('HORARIO:<br /><br /> ', estilo_tabla)
+
+    horarioExtendido = Paragraph('HORARIO EXTENDIDO:<br /><br /> ', estilo_tabla)
+    x.append(('SPAN', (2, 8), (3, 8))), # Extendiendo columna horarioExtendido
 
     tabla.append([hdatos])
     tabla.append([nombre, licencia])
