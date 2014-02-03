@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render
 import datetime
 from django.conf import settings
@@ -56,10 +58,10 @@ def licencia_expendio_alcohol(request):
     estilo_fechas.leading = 15
 
     elementos.append(Spacer(1, -40))
-    txtFechas = u'Fecha de Solicitud: '
-    txtFechas += u'<br />Valido Hasta: '
-    txtFechas += u'<br />N° de Solicitud: '
-    txtFechas += u'<br />N° de Autorización: '
+    txtFechas = 'Fecha de Solicitud: '
+    txtFechas += '<br />Valido Hasta: '
+    txtFechas += '<br />N° de Solicitud: '
+    txtFechas += '<br />N° de Autorización: '
     texto_fechas = Paragraph(txtFechas, estilo_fechas)
     elementos.append(texto_fechas)
     #---> Fin Fechas <---
@@ -70,7 +72,7 @@ def licencia_expendio_alcohol(request):
     estilo_titulo.fontSize = 18
     estilo_titulo.fontName = 'Helvetica-Bold'
 
-    txtTitulo = u'AUTORIZACION PARA EL EXPENDIO DE ALCOHOL Y ESPECIES ALCOHOLICAS'
+    txtTitulo = 'AUTORIZACION PARA EL EXPENDIO DE ALCOHOL Y ESPECIES ALCOHOLICAS'
     texto_titulo = Paragraph(txtTitulo, estilo_titulo)
     elementos.append(texto_titulo)
     #---> Fin Titulo <---
