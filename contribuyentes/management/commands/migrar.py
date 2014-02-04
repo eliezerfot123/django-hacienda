@@ -13,6 +13,7 @@ class Command(BaseCommand):
         make_option('--contriblic',action='store',nargs=1,dest='contriblic',help='Importar contribuyentes_LIC'),
         make_option('--liquidacion',action='store',nargs=1,dest='liquidacion',help='Importar liquidaciones'),
         make_option('--licencia',action='store',nargs=1,dest='licencia',help='Importar licencia'),
+        make_option('--pago',action='store',nargs=1,dest='pagos',help='Importar pagos'),
         
         )
     def __abrir_archivo(self,nombre):
@@ -37,7 +38,7 @@ class Command(BaseCommand):
 
     def __contribuyentelic(self,archivo):
         #for n in range(24000):
-        #next(archivo)
+        next(archivo)
         for linea in archivo:
             print (linea)
             if not Contribuyente.objects.filter(num_identificacion=linea[2]).exists():
@@ -60,6 +61,7 @@ class Command(BaseCommand):
                 print ("EXISTE")
 
     def __liquidacion(self,archivo):
+        next(archivo)
         for linea in archivo:
             print (linea)
             if not Liquidacion.objects.filter(numero=linea[0]).exists():
@@ -74,15 +76,48 @@ class Command(BaseCommand):
                 liq=Liquidacion(numero=linea[0],trimestre=linea[1],ano=linea[2],monto=linea[3],recargo=linea[4],intereses=linea[5],impuesto=impuesto,emision=linea[7])
                 liq.save()
                 print (liq.numero)
+    def __fechas(self,fecha):
+        fecha=fecha.split('/')
+        return fecha[2]+"-"+fecha[1]+"-"+fecha[0]
+    def __pagos(self,archivo):
+        #for n in range(3400):
+        next(archivo)
+        import pdb
+        pdb.set_trace()
+        for linea in archivo:
+            #print (linea)
+            contrib=Contribuyente.objects.filter(id_contrato=linea[1])
+
+            if contrib.exists():
+                liquid=Liquidacion.objects.filter(numero=linea[0])
+                if liquid.exists():
+                    contrib=contrib[0]
+                    liquid=liquid[0]
+                    if not Pagos.objects.filter(liquidacion=liquid).exists():
+
+                        linea[3]=self.__fechas(linea[3])
+                        linea[5]=self.__fechas(linea[5])
+                        linea[13]=self.__fechas(linea[13])
+                        Pago(liquidacion=liquid,contribuyente=contrib,deposito=linea[2],emision=linea[3],vencimiento=linea[4],credito_fiscal=linea[5],descuento=linea[6],impuesto=linea[7],recargo=linea[8],intereses=linea[9],fecha_pago=linea[13],observaciones=linea[18]).save()
+                else:
+                    print ("No existe liquidacion")
+
+            else:
+                print (linea)
+                print ("No existe contribuyente ",linea[1])
 
     def __licencia(self,archivo):
         #for n in range(3400):
-            next(archivo)
+        next(archivo)
         for linea in archivo:
-            print (linea)
-            contrib=Contribuyente.objects.filter(num_identificacion=linea[8])
+            #print (linea)
+            if type(linea[6]) is int:
+                contrib=Contribuyente.objects.filter(id_contrato=linea[6])
+            else:
+                contrib=Contribuyente.objects.filter(num_identificacion=linea[8])
 
             if contrib.exists():
+                contrib=contrib[0]
                 if not Licencia.objects.filter(serial=linea[0]).exists():
                     if linea[3] is '': linea[3]=0
                     if linea[4] is '': linea[4]=linea[5]
@@ -91,7 +126,7 @@ class Command(BaseCommand):
                     linea[4]=fecha[2]+"-"+fecha[1]+"-"+fecha[0]
                     fecha=linea[5].split('/')
                     linea[5]=fecha[2]+"-"+fecha[1]+"-"+fecha[0]
-                    Licencia(serial=linea[0],control=linea[1],numero=linea[2],cantidad=linea[3],emision=linea[4],valido=linea[5],campoid=linea[6]).save()
+                    Licencia(serial=linea[0],control=linea[1],numero=linea[2],cantidad=linea[3],emision=linea[4],valido=linea[5],contribuyente=contrib).save()
 
 
 
@@ -161,6 +196,10 @@ class Command(BaseCommand):
             nombre=options['licencia']
             archivo=self.__abrir_archivo(nombre)
             self.__licencia(archivo)
+        elif options['pagos']is not None: 
+            nombre=options['pagos']
+            archivo=self.__abrir_archivo(nombre)
+            self.__pagos(archivo)
             
 
 
