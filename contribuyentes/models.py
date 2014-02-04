@@ -31,8 +31,9 @@ class Contribuyente(models.Model):
     def licencias(self,):
         return Licencia.object.filter(contribuyente=self.pk)
 
-    def liquidaciones(self):
-        return Liquidacion.objects.filter(contribuyente=self.pk)
+    def liquidaciones(contrib):
+        from liquidaciones.models import Pago
+        return Pago.objects.filter(contribuyente=contrib)
 
 class Licencia(models.Model):
     serial=models.CharField(max_length=20)
@@ -43,7 +44,3 @@ class Licencia(models.Model):
     valido=models.DateField()
     #campoid=models.IntegerField(null=True,blank=True)
     contribuyente=models.ForeignKey(Contribuyente)
-
-
-
-

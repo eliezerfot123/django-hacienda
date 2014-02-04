@@ -1,14 +1,13 @@
 from django.db import models
-from contribuyentes.models import Contribuyente
 
-# Create your models here.
 
 class Impuesto(models.Model):
     codigo=models.IntegerField()
     descripcion=models.CharField(max_length=200,default='Sin definir')
 
-     
-    
+    def __unicode__(self):
+        return '%s - %s'%(self.codigo,self.descripcion)
+
 
 class Liquidacion(models.Model):
     numero=models.CharField(max_length=20)
@@ -20,7 +19,13 @@ class Liquidacion(models.Model):
     impuesto=models.ForeignKey(Impuesto)
     emision=models.DateField()
 
+    def __unicode__(self):
+        return '%s - %s' % (self.numero, self.monto)
+
+
 class Pago(models.Model):
+    from contribuyentes.models import Contribuyente
+
     liquidacion=models.ForeignKey(Liquidacion,null=True)
     num_liquidacion=models.CharField(null=True,max_length=20)
     contribuyente=models.ForeignKey(Contribuyente)
@@ -34,6 +39,3 @@ class Pago(models.Model):
     intereses=models.FloatField(null=True,default=0.0)
     fecha_pago=models.DateField()
     observaciones=models.TextField(null=True)
-
-
-

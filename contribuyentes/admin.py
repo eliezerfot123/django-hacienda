@@ -14,3 +14,9 @@ class RubroAdmin(admin.ModelAdmin):
     list_display = ['codigo','rubro','alicuota','ut']
     ordering = ['codigo']
 admin.site.register(Rubro, RubroAdmin)
+
+class LicenciaAdmin(admin.ModelAdmin):
+    search_fields = ['serial', 'control', 'numero']
+    list_display = ['serial','control', 'numero', 'cantidad', 'emision', 'valido', 'contribuyente']
+    ordering = ['serial']
+admin.site.register(Licencia, LicenciaAdmin)

@@ -6,8 +6,9 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url('^login/',include('login.urls')),
-    url('^reporte/',include('reportes.urls')),
+    url('^login/', include('login.urls')),
+    url('^reporte/', include('reportes.urls')),
+    url('^contrib/', include('contribuyentes.urls')),
     url(r'^sdr/$', 'contribuyentes.views.lista_contribuyentes'),
     url(r'^$', 'login.views.home', name='home'),
 )
