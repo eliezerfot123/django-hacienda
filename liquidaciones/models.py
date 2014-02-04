@@ -21,7 +21,8 @@ class Liquidacion(models.Model):
     emision=models.DateField()
 
 class Pago(models.Model):
-    liquidacion=models.ForeignKey(Liquidacion)
+    liquidacion=models.ForeignKey(Liquidacion,null=True)
+    num_liquidacion=models.CharField(null=True,max_length=20)
     contribuyente=models.ForeignKey(Contribuyente)
     deposito=models.CharField(max_length=20)
     emision=models.DateField()
