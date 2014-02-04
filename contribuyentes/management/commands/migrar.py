@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from contribuyentes.models import *
 from liquidaciones.models import *
+from django.db.models import Q
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--rubro',
@@ -78,29 +79,39 @@ class Command(BaseCommand):
                 print (liq.numero)
     def __fechas(self,fecha):
         fecha=fecha.split('/')
-        return fecha[2]+"-"+fecha[1]+"-"+fecha[0]
+        try:
+            return fecha[2]+"-"+fecha[1]+"-"+fecha[0]
+        except IndexError:
+            print (fecha)
+            raise IndexError
     def __pagos(self,archivo):
-        #for n in range(3400):
+        #for n in range(12800):
         next(archivo)
-        import pdb
-        pdb.set_trace()
         for linea in archivo:
             #print (linea)
             contrib=Contribuyente.objects.filter(id_contrato=linea[1])
 
             if contrib.exists():
                 liquid=Liquidacion.objects.filter(numero=linea[0])
+                contrib=contrib[0]
                 if liquid.exists():
-                    contrib=contrib[0]
-                    liquid=liquid[0]
-                    if not Pagos.objects.filter(liquidacion=liquid).exists():
-
-                        linea[3]=self.__fechas(linea[3])
-                        linea[5]=self.__fechas(linea[5])
-                        linea[13]=self.__fechas(linea[13])
-                        Pago(liquidacion=liquid,contribuyente=contrib,deposito=linea[2],emision=linea[3],vencimiento=linea[4],credito_fiscal=linea[5],descuento=linea[6],impuesto=linea[7],recargo=linea[8],intereses=linea[9],fecha_pago=linea[13],observaciones=linea[18]).save()
+                    pago=Pago.objects.filter(liquidacion=liquid)
                 else:
-                    print ("No existe liquidacion")
+                    pago=Pago.objects.filter(num_liquidacion=linea[0])
+                if not pago.exists():
+                    print (linea)
+
+                    linea[3]=self.__fechas(linea[3])
+                    linea[4]=self.__fechas(linea[4])
+                    linea[13]=self.__fechas(linea[13])
+                    pago=Pago(contribuyente=contrib,deposito=linea[2],emision=linea[3],vencimiento=linea[4],credito_fiscal=linea[5],descuento=linea[6],impuesto=linea[7],recargo=linea[8],intereses=linea[9],fecha_pago=linea[13],observaciones=linea[18])
+                    if liquid.exists():
+                        liquid=liquid[0]
+                        pago.liquidacion=liquid
+                    else:
+                        pago.num_liquidacion=linea[0]
+
+                    pago.save()
 
             else:
                 print (linea)
