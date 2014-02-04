@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'contribuyentes',
     'liquidaciones',
     'login',
+    'reportes',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -73,7 +74,6 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
 
 MEDIA_URL = '/media/'
-
 STATIC_ROOT = os.path.join(PROJECT_PATH, 'static')
 
 STATIC_URL = '/static/'
