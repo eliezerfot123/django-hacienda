@@ -31,9 +31,9 @@ class Contribuyente(models.Model):
     def licencias(self,):
         return Licencia.object.filter(contribuyente=self.pk)
 
-    def liquidaciones(contrib):
+    def liquidaciones(self,contrib):
         from liquidaciones.models import Pago
-        return Pago.objects.filter(contribuyente=contrib)
+        return Pago.objects.filter(contribuyente=self)
 
 class Licencia(models.Model):
     serial=models.CharField(max_length=20)
