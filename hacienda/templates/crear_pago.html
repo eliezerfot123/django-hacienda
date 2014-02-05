@@ -324,6 +324,15 @@
 								<form class="form-horizontal" />
 									<div class="control-group">
 										<div class="row-fluid">
+											<label class="control-label" for="form-field-select-3">Contribuyente</label>&nbsp; &nbsp; &nbsp;
+
+											<input id="ContribAjax" type="text" class="col-md-12 form-control" placeholder="Buscar Contrib..." autocomplete="off" />{% csrf_token %}
+											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Autocompletado a partir de 4 caracteres." title="Contribuyente">?</span>
+										</div>
+									</div>
+
+									<div class="control-group">
+										<div class="row-fluid">
 											<label class="control-label" for="form-field-select-3">Liquidación</label>&nbsp; &nbsp; &nbsp;
 
 											<select class="chzn-select" id="form-field-select-3" data-placeholder="Seleccione Liquidación...">
@@ -344,112 +353,16 @@
 
 									<div class="control-group">
 										<div class="row-fluid">
-											<label for="form-field-select-3">Contribuyente</label>
+											<label class="control-label" for="form-field-select-3">Fecha Pago</label>
+										
 
-											<select class="chzn-select" id="form-field-select-3" data-placeholder="Seleccione Contribuyente...">
-												<option value="" />
-												<option value="AL" />Alabama
-											</select>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<div class="row-fluid">
-											<label for="form-field-select-3">Contribuyente</label>
-
-											<select class="chzn-select" id="form-field-select-3" data-placeholder="Seleccione Contribuyente...">
-												<option value="" />
-												<option value="AL" />Alabama
-											</select>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<div class="row-fluid">
-											<label for="id-date-picker-1">Fecha Emision</label>
-										</div>
-
-										<div class="control-group">
-											<div class="row-fluid input-append">
-												<input class="span2 date-picker" id="id-date-picker-1" type="text" data-date-format="dd-mm-yyyy" />
-												<span class="add-on">
-													<i class="icon-calendar"></i>
-												</span>
-											</div>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<div class="row-fluid">
-											<label for="id-date-picker-1">Fecha Vencimiento</label>
-										</div>
-
-										<div class="control-group">
-											<div class="row-fluid input-append">
-												<input class="span2 date-picker" id="id-date-picker-1" type="text" data-date-format="dd-mm-yyyy" />
-												<span class="add-on">
-													<i class="icon-calendar"></i>
-												</span>
-											</div>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<label class="control-label" for="form-field-6">Credito Fiscal</label>
-
-										<div class="controls">
-											<input data-rel="tooltip" type="text" id="form-field-6" placeholder="0.0" title="" data-placement="bottom" />
-											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese Credito Fiscal." title="Credito Fiscal">?</span>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<label class="control-label" for="form-field-6">Descuento</label>
-
-										<div class="controls">
-											<input data-rel="tooltip" type="text" id="form-field-6" placeholder="0.0" title="" data-placement="bottom" />
-											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese Descuento." title="Credito Fiscal">?</span>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<label class="control-label" for="form-field-6">Impuesto</label>
-
-										<div class="controls">
-											<input data-rel="tooltip" type="text" id="form-field-6" placeholder="0.0" title="" data-placement="bottom" />
-											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese Impuesto." title="Credito Fiscal">?</span>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<label class="control-label" for="form-field-6">Recargo</label>
-
-										<div class="controls">
-											<input data-rel="tooltip" type="text" id="form-field-6" placeholder="0.0" title="" data-placement="bottom" />
-											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese Recargo." title="Credito Fiscal">?</span>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<label class="control-label" for="form-field-6">Intereses</label>
-
-										<div class="controls">
-											<input data-rel="tooltip" type="text" id="form-field-6" placeholder="0.0" title="" data-placement="bottom" />
-											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese Intereses." title="Credito Fiscal">?</span>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<div class="row-fluid">
-											<label for="id-date-picker-1">Fecha Pago</label>
-										</div>
-
-										<div class="control-group">
-											<div class="row-fluid input-append">
-												<input class="span2 date-picker" id="id-date-picker-1" type="text" data-date-format="dd-mm-yyyy" />
-												<span class="add-on">
-													<i class="icon-calendar"></i>
-												</span>
+											<div class="controls">
+												<div class="row-fluid input-append">
+													<input class="span2 date-picker" id="id-date-picker-1" type="text" data-date-format="dd-mm-yyyy" />
+													<span class="add-on">
+														<i class="icon-calendar"></i>
+													</span>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -457,7 +370,7 @@
 									<hr />
 									<div class="control-group">
 										<div class="row-fluid">
-											<label for="form-field-11">Observaciones</label>
+											<label class="control-label" for="form-field-select-3">Observaciones</label>&nbsp; &nbsp; &nbsp;
 
 											<textarea id="form-field-11" class="autosize-transition span4"></textarea>
 										</div>
@@ -534,6 +447,7 @@
 		<script src="{% static "assets/js/jquery.inputlimiter.1.3.1.min.js" %}"></script>
 		<script src="{% static "assets/js/jquery.maskedinput.min.js" %}"></script>
 		<script src="{% static "assets/js/bootstrap-tag.min.js" %}"></script>
+		<script src="{% static "assets/js/bootstrap-typeahead.js" %}"></script>
 
 		<!--ace scripts-->
 		<script src="{% static "assets/js/ace-elements.min.js" %}"></script>
@@ -801,6 +715,14 @@
 					$(this).find('.modal-chosen').chosen();
 				})
 				*/
+
+				$('#ContribAjax').typeahead({
+                    ajax: {
+                        url: '/contrib/ajax_contrib/',
+                        method: 'post',
+                        triggerLength: 4
+                    },
+                });
 			
 			});
 		</script>

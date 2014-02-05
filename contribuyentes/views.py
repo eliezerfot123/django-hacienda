@@ -60,6 +60,7 @@ def crear_pagos(request):
     if request.method == 'POST':
         form = CrearPagosForm(request.POST)
         if form.is_valid():
+
             pass
         else:
             return render(request, 'crear_pago.html')
@@ -70,3 +71,10 @@ def crear_pagos(request):
         c.update(csrf(request))
         c.update({'form':form, 'usuario':request.user.get_username()})
         return render(request, 'crear_pago.html', c)
+
+
+@login_required(login_url='/login/')
+@csrf_protect
+def ajax_contrib(request, data):
+    import pdb
+    pdb.set_trace()
