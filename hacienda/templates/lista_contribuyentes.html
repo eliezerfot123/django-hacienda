@@ -360,53 +360,19 @@
 												<td>{{ contrib.email }}</td>
 
 												<td class="td-actions">
-												<div class="hidden-phone visible-desktop action-buttons">
-													<a class="blue" href="#">
-														<i class="icon-zoom-in bigger-130"></i>
-													</a>
+													<div class="hidden-phone visible-desktop action-buttons">
+														<a class="blue" href="{% url "contrib-liquids" contrib.pk %}" title="Ver liquidaciones">
+															<i class="icon-zoom-in bigger-130"></i>
+														</a>
 
-													<a class="green" href="#">
-														<i class="icon-pencil bigger-130"></i>
-													</a>
+														<a class="green" href="#" title="Editar contribuyente">
+															<i class="icon-pencil bigger-130"></i>
+														</a>
 
-													<a class="red" href="#">
-														<i class="icon-trash bigger-130"></i>
-													</a>
-												</div>
-
-												<div class="hidden-desktop visible-phone">
-													<div class="inline position-relative">
-														<button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown">
-															<i class="icon-caret-down icon-only bigger-120"></i>
-														</button>
-
-														<ul class="dropdown-menu dropdown-icon-only dropdown-yellow pull-right dropdown-caret dropdown-close">
-															<li>
-																<a href="#" class="tooltip-info" data-rel="tooltip" title="View">
-																	<span class="blue">
-																		<i class="icon-zoom-in bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-
-															<li>
-																<a href="#" class="tooltip-success" data-rel="tooltip" title="Edit">
-																	<span class="green">
-																		<i class="icon-edit bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-
-															<li>
-																<a href="#" class="tooltip-error" data-rel="tooltip" title="Delete">
-																	<span class="red">
-																		<i class="icon-trash bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-														</ul>
+														<a class="red" href="#">
+															<i class="icon-trash bigger-130"></i>
+														</a>
 													</div>
-												</div>
 											    </td>
 											</tr>
 										{% endfor %}
