@@ -5,7 +5,7 @@ from django.template.context import RequestContext
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from liquidaciones.models import Pago, Liquidacion
+from liquidaciones.models import Pago, Liquidacion,Impuesto
 from contribuyentes.forms import CrearPagosForm
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
@@ -63,18 +63,17 @@ def crear_pagos(request):
 
             pass
         else:
-            return render(request, 'crear_pago.html')
+            return render(request, 'crear_pago.html',)
 
     else:
         form = CrearPagosForm()
         c = {}
+        impuestos=Impuesto.objects.all()
         c.update(csrf(request))
-        c.update({'form':form, 'usuario':request.user.get_username()})
+        c.update({'form':form, 'usuario':request.user.get_username(),'impuestos':impuestos})
         return render(request, 'crear_pago.html', c)
 
 
 @login_required(login_url='/login/')
 @csrf_protect
 def ajax_contrib(request, data):
-    import pdb
-    pdb.set_trace()

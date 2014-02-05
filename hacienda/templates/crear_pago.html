@@ -199,6 +199,20 @@
 											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese el número de deposito del banco." title="Deposito">?</span>
 										</div>
 									</div>
+									<div class="control-group">
+                                            <label class="control-label" for="form-field-select-4">Impuestos</label>
+											<div class="controls">
+												<div class="row-fluid input-append">
+
+                                                        <select multiple="" class="chzn-select" id="form-field-select-4" data-placeholder="Choose a Country...">
+                                                        {% for impuesto in impuestos %}
+                                                            <option value="{{ impuesto.id}}" />{{impuesto.codigo}} {{ impuesto.descripcion }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                </div>
+                                            </div>
+                
+                                    </div>
 
 									<div class="control-group">
 										<div class="row-fluid">
