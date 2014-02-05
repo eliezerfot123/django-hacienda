@@ -35,7 +35,7 @@ def lista_contribuyentes(request):
 @login_required(login_url='/login/')
 def contrib_liquids(request, id_contrib):
     if id_contrib is not None:
-        contrib_liq = Contribuyente.objects.get(pk=id_contrib).liquidaciones
+        contrib_liq = Contribuyente.objects.get(pk=id_contrib).liquidaciones(id_contrib)
 
         return render(request, 'contrib_liquidaciones.html',
                     {'contrib_liq': contrib_liq,
