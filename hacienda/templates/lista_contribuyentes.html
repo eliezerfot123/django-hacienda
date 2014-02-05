@@ -157,7 +157,6 @@
 											<i class="icon-eye-open"></i>
 
 											Ver Licencia
-											<b class="arrow icon-angle-down"></b>
 										</a>
 									</li>
 								</ul>
@@ -195,7 +194,6 @@
 											<i class="icon-eye-open"></i>
 
 											Ver Liquidación
-											<b class="arrow icon-angle-down"></b>
 										</a>
 									</li>
 								</ul>
@@ -229,17 +227,54 @@
 									</li>
 
 									<li>
-										<a href="#" class="dropdown-toggle">
+										<a href="/sdr/" class="dropdown-toggle">
 											<i class="icon-search"></i>
 
 											Buscar Contribuyente
-											<b class="arrow icon-angle-down"></b>
 										</a>
 									</li>
 								</ul>
 							</li>
 						</ul>
 					</li>
+
+					<li>
+						<a href="#" class="dropdown-toggle">
+							<i class="icon-credit-card bigger-110"></i>
+							<span class="menu-text"> Pagos </span>
+
+							<b class="arrow icon-angle-down"></b>
+						</a>
+
+						<ul class="submenu">
+							<li>
+								<a href="#" class="dropdown-toggle">
+									<i class="icon-double-angle-right"></i>
+
+									Elementos
+									<b class="arrow icon-angle-down"></b>
+								</a>
+
+								<ul class="submenu">
+									<li>
+										<a href="/contrib/crear_pago/">
+											<i class="icon-plus"></i>
+											Cargar pago
+										</a>
+									</li>
+
+									<li>
+										<a href="#" class="dropdown-toggle">
+											<i class="icon-search"></i>
+
+											Consultar pago
+										</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+
 				</ul><!--/.nav-list-->
 
 				<div class="sidebar-collapse" id="sidebar-collapse">
@@ -361,7 +396,7 @@
 
 												<td class="td-actions">
 													<div class="hidden-phone visible-desktop action-buttons">
-														<a class="blue" href="{% url "contrib-liquids" contrib.pk %}" title="Ver liquidaciones">
+														<a class="blue" href="{% url "contrib-liquids" contrib.pk %}" title="Ver Pagos">
 															<i class="icon-zoom-in bigger-130"></i>
 														</a>
 

@@ -2,9 +2,13 @@
 from django.shortcuts import render
 from contribuyentes.models import *
 from django.template.context import RequestContext
+from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from liquidaciones.models import Pago, Liquidacion
+from contribuyentes.forms import CrearPagosForm
+from django.core.context_processors import csrf
+from django.views.decorators.csrf import csrf_protect
 
 
 @login_required(login_url='/login/')
@@ -36,10 +40,11 @@ def lista_contribuyentes(request):
 def contrib_liquids(request, id_contrib):
     if id_contrib is not None:
         contrib_liq = Contribuyente.objects.get(pk=id_contrib).liquidaciones(id_contrib)
+        contrib_representante = Contribuyente.objects.get(pk=id_contrib)
 
         return render(request, 'contrib_liquidaciones.html',
                     {'contrib_liq': contrib_liq,
-                     'contrib_representante': contrib_liq[0].contribuyente.nombre,
+                     'contrib_representante': contrib_representante,
                     'usuario': request.user.get_username()},
                     context_instance=RequestContext(request))
     else:
@@ -47,3 +52,21 @@ def contrib_liquids(request, id_contrib):
                     {'usuario': request.user.get_username()})
 
     return render(request, 'contrib_liquidaciones.html')
+
+
+@login_required(login_url='/login/')
+@csrf_protect
+def crear_pagos(request):
+    if request.method == 'POST':
+        form = CrearPagosForm(request.POST)
+        if form.is_valid():
+            pass
+        else:
+            return render(request, 'crear_pago.html')
+
+    else:
+        form = CrearPagosForm()
+        c = {}
+        c.update(csrf(request))
+        c.update({'form':form, 'usuario':request.user.get_username()})
+        return render(request, 'crear_pago.html', c)
