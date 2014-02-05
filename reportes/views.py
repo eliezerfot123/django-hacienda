@@ -82,3 +82,29 @@ def licencia_expendio_alcohol(request):
     elementos.showPage()
     elementos.save()
     return response
+
+
+@login_required(login_url='/login/')
+def vauche_imprimir(request):
+    nombre_reporte = "Vauche de Pago"
+    response = HttpResponse(mimetype='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename='+nombre_reporte+'.pdf; pagesize=letter;'
+
+    elementos = canvas.Canvas(response)
+
+    elementos.setFont("Helvetica", 8) # Tamaño de letra
+
+    elementos.drawCentredString(PAGE_WIDTH-8.5*cm, PAGE_HEIGHT-0.7*cm, 'x')
+
+    # Datos del depositante
+    elementos.drawCentredString(PAGE_WIDTH-15.5*cm, PAGE_HEIGHT-2.0*cm, 'Alcaldía de San Carlos')
+    elementos.drawCentredString(PAGE_WIDTH-15.5*cm, PAGE_HEIGHT-3.3*cm, 'Luis Carlos Rodriguez Quiñones')
+    elementos.drawCentredString(PAGE_WIDTH-15.5*cm, PAGE_HEIGHT-4.0*cm, '20.522.392')
+
+    # n° de cuenta
+    elementos.setFont("Helvetica", 12) # Tamaño de letra
+    elementos.drawCentredString(PAGE_WIDTH-7.7*cm, PAGE_HEIGHT-1.8*cm, '0  0  0  1  2  3  4  5  6  7  8  9  1  2  3  4  5  6  7  8')
+
+    elementos.showPage()
+    elementos.save()
+    return response

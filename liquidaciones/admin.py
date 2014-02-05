@@ -18,7 +18,7 @@ admin.site.register(Impuesto, ImpuestoAdmin)
 
 
 class PagoAdmin(admin.ModelAdmin):
-    search_fields = ['deposito', 'emision', 'vencimiento', 'observaciones']
-    list_display = ['deposito', 'emision', 'vencimiento', 'recargo', 'fecha_pago', 'liquidacion', 'contribuyente']
+    search_fields = ['num_liquidacion', 'deposito', 'emision', 'vencimiento', 'observaciones']
+    list_display = ['contribuyente', 'num_liquidacion', 'deposito', 'emision', 'vencimiento', 'recargo', 'fecha_pago', 'liquidacion']
     ordering = ['emision']
 admin.site.register(Pago, PagoAdmin)
