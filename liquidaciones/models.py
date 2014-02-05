@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Impuesto(models.Model):
@@ -18,6 +19,7 @@ class Liquidacion(models.Model):
     intereses=models.FloatField()
     impuesto=models.ForeignKey(Impuesto)
     emision=models.DateField()
+    liquidador=models.ForeignKey(User)
 
     def __unicode__(self):
         return '%s - %s' % (self.numero, self.monto)
