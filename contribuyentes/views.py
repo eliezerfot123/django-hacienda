@@ -13,11 +13,38 @@ from django.contrib.formtools.wizard.views import SessionWizardView
 from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm
 
 
-@login_required(login_url='/login/')
-@csrf_protect
 class LiquidacionWizard(SessionWizardView):
     form_list = [ImpuestosForm, RubrosForm, LiquidacionForm]
     template_name = 'crear_pago.html'
+
+    def get_form_initial(self, step):
+        # steps are named 'step1', 'step2', 'step3'
+        current_step = self.storage.current_step
+        # get the data for step 1 on step 3
+        if current_step == 'step1':
+            prev_data = self.storage.get_step_data('step1')
+            get_contrib = prev_data.get('step1-contrib','')
+
+            return self.initial_dict.get(step, {'contrib': get_contrib})
+
+        return self.initial_dict.get(step, {})
+
+    def get_form(self, step=None, data=None, files=None):
+        formu = super(LiquidacionWizard, self).get_form(step, data, files)
+
+        if step is None:
+            step = self.steps.current
+
+        if step == '1':
+            if formu.fields['contrib'] is not None:
+                formu.fields['contrib'].queryset = self.query
+                print(formu)
+        return formu
+
+    def process_step(self, request, form, step):
+
+        if step=='0':
+            self.query = Contribuyente.objects.filter(Q(pk=form.cleaned_data['contrib'].pk)).distinct()
 
     def done(self, form_list, **kwargs):
         do_something_with_the_form_data(form_list)

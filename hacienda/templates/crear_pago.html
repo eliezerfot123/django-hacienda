@@ -193,42 +193,20 @@
 									</ul>
 								</div>
 								<hr></hr>
+
 								{% block formulario %} 
 							            {{ wizard.management_form }}
-								    <form action="." method="post" >{% csrf_token %} 
-								    {{ previous_fields|safe }}
-								            {{ wizard.management_form }}
-								    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
-								        <table>
-								            <tr>
-								                {{form}}
-								            </tr>
-								        </table>
-
-								        <div class="submit-row">
-								            <center>
-								            <br><br><input type="submit" value="{% if step < step_count %}Siguiente {% else %} Generar Reporte {% endif %}" class="boton"/>
-								            </center>
-								        </div>
-
-								    </form>
-								{% endblock %}
-								<form class="form-horizontal" />
+								<form class="form-horizontal" />{% csrf_token %}
+									{{ previous_fields|safe }}
+								    	{{ wizard.management_form }}
+								    	<input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+								    	{% if wizard.steps.current == '0' %} <!--Primer formulario-->
 									<div class="control-group">
 										<div class="row-fluid">
 											<label class="control-label" for="form-field-select-3">Contribuyente</label>&nbsp; &nbsp; &nbsp;
-
-											<input id="ContribAjax" type="text" class="col-md-12 form-control span5" placeholder="Buscar Contrib..." autocomplete="off" />
+											<!--{{form.contrib.auto_id}}-->
+											<input id="{{form.contrib.auto_id}}" name="{{ form.contrib.auto_name }}" type="text" class="ContribAjax col-md-12 form-control span5" placeholder="Buscar Contrib..." autocomplete="off" />
 											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Autocompletado a partir de 4 caracteres." title="Contribuyente">?</span>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<label class="control-label" for="form-field-6">N° Deposito</label>
-
-										<div class="controls">
-											<input data-rel="tooltip" class="span3" type="text" id="form-field-6" placeholder="Deposito" title="" data-placement="bottom" />
-											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese el número de deposito del banco." title="Deposito">?</span>
 										</div>
 									</div>
 									<div class="control-group">
@@ -236,44 +214,71 @@
 	                                        <label class="control-label" for="form-field-select-4">Impuestos</label>
 											<div class="controls">
 
-                                                <select multiple="" class="chzn-select span4" id="form-field-select-4" data-placeholder="Seleccione impuestos...">
-                                                {% for impuesto in impuestos %}
-                                                    <option value="{{ impuesto.id}}" />{{impuesto.codigo}} {{ impuesto.descripcion }}</option>
+                                                <select multiple="" name="{{ form.impuesto.auto_name }}" class="chzn-select span4" id="form-field-select-4" data-placeholder="Seleccione impuestos...">
+                                                {% for id, dato in form.fields.impuesto.choices %}
+                                                    <option value="{{ id }}" />{{ dato}}</option>
                                                 {% endfor %}
                                                 </select>
                                                 <span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Seleccione los impuestos." title="Impuestos">?</span>
 	                                        </div>
                                         </div>
                                     </div>
+										{% endif %}
 
-									<div class="control-group">
-										<div class="row-fluid">
-											<label class="control-label" for="form-field-select-3">Fecha Pago</label>
-										
+										{% if wizard.steps.current == '1' %} <!--Segundo formulario-->
+											<div class="control-group">
+												<div class="row-fluid">
+			                                        <label class="control-label" for="form-field-select-4">Rubros</label>
+													<div class="controls">
+
+		                                                <select multiple="" name="{{ form.rubros.auto_name }}" class="chzn-select span4" id="form-field-select-4" data-placeholder="Seleccione impuestos...">
+		                                                {% for id, datos in form.fields.rubros.choices %}
+		                                                    <option value="{{ id }}" />{{ datos }}</option>
+		                                                {% endfor %}
+		                                                </select>
+		                                                <span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Seleccione los rubros." title="Rubros">?</span>
+			                                        </div>
+		                                        </div>
+		                                    </div>
+										{% endif %}
+
+										{% if wizard.steps.current == '2' %} <!--Tercer formulario-->
+										<div class="control-group">
+											<label class="control-label" for="form-field-6">N° Deposito</label>
 
 											<div class="controls">
-												<div class="row-fluid input-append">
-													<input class="span2 date-picker" id="id-date-picker-1" type="text" data-date-format="dd-mm-yyyy" />
-													<span class="add-on">
-														<i class="icon-calendar"></i>
-													</span>
-													<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Seleccione la fecha de pago (Opcional)." title="Fecha Pago">?</span>
-												</div>
+												<input data-rel="tooltip" class="span3" type="text" id="form-field-6" placeholder="Deposito" title="" data-placement="bottom" />
+												<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese el número de deposito del banco." title="Deposito">?</span>
 											</div>
 										</div>
-									</div>
 
-									<hr />
-									<div class="control-group">
-										<div class="row-fluid">
-											<label class="control-label" for="form-field-select-3">Observaciones</label>&nbsp; &nbsp; &nbsp;
+										<hr />
+										<div class="control-group">
+											<div class="row-fluid">
+												<label class="control-label" for="form-field-select-3">Observaciones</label>&nbsp; &nbsp; &nbsp;
 
-											<textarea id="form-field-11" class="autosize-transition span4"></textarea>
+												<textarea id="form-field-11" class="autosize-transition span4"></textarea>
+											</div>
 										</div>
-									</div>
+										{% endif %}
+								{% endblock %}
 
-									<div class="row-fluid wizard-actions">
-										<button type="submit" value="{% if step < step_count %}Siguiente {% else %} Crear {% endif %}" class="btn btn-success btn-next"/>
+									
+									<p>Paso {{ wizard.steps.step1 }} de {{ wizard.steps.count }}</p>
+									<div class="modal-footer wizard-actions">
+									{% if wizard.steps.prev %}
+										<div class="row-fluid wizard-actions">
+											<button type="submit" value="{{ wizard.steps.first }}" class="btn btn-success btn-next"/>
+												Primero
+											</button>
+											<button type="submit" value="{{ wizard.steps.prev }}" class="btn btn-success btn-next"/>
+												Anterior
+											</button>
+										</div>
+									{% endif %}
+										<button type="submit" class="btn btn-success btn-small btn-next" data-last="Finish ">
+											{% if wizard.steps.step1 < wizard.steps.count %} Siguiente {% else %} Generar {% endif %}
+											<i class="icon-arrow-right icon-on-right"></i>
 										</button>
 									</div>
 								</form>
@@ -305,7 +310,6 @@
 		<script type="text/javascript">
 			window.jQuery || document.write("<script src='{% static "assets/js/jquery-2.0.3.min.js" %}'>"+"<"+"/script>");
 		</script>
-
 		<!--<![endif]-->
 
 		<!--[if IE]>
@@ -590,7 +594,7 @@
 				})
 				*/
 
-				$('#ContribAjax').typeahead({
+				$('.ContribAjax').typeahead({
                     ajax: {
                         url: '/contrib/ajax_contrib/',
                         method: 'get',
