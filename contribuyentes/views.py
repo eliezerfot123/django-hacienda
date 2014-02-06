@@ -9,7 +9,6 @@ from liquidaciones.models import Pago, Liquidacion,Impuesto
 from contribuyentes.forms import CrearPagosForm
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
-from django.utils import simplejson
 import json
 
 
@@ -89,7 +88,8 @@ def ajax_contrib(request):
                 Q(telf__startswith=contribuyente) |
                 Q(email__icontains=contribuyente) |
                 Q(representante__icontains=contribuyente) |
-                Q(cedula_rep__startswith=contribuyente)).order_by('-nombre')
+                Q(cedula_rep__istartswith=contribuyente)).values_list('pk','id_contrato','num_identificacion','nombre').order_by('-nombre')
 
-    contrib_json = simplejson.dumps({'result':list(contrib_filter)})
+    contrib=[({'id':p[0], 'nombre': '{0} {1} {2}'.format( p[1], p[2],p[3]),}) for p in contrib_filter]
+    contrib_json = json.dumps(contrib)
     return HttpResponse(contrib_json, mimetype='application/javascript')
