@@ -2,13 +2,15 @@
 from django.shortcuts import render
 from contribuyentes.models import *
 from django.template.context import RequestContext
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from liquidaciones.models import Pago, Liquidacion,Impuesto
 from contribuyentes.forms import CrearPagosForm
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
+from django.utils import simplejson
+import json
 
 
 @login_required(login_url='/login/')
@@ -76,4 +78,18 @@ def crear_pagos(request):
 
 @login_required(login_url='/login/')
 @csrf_protect
-def ajax_contrib(request, data):
+def ajax_contrib(request):
+    if request.method == 'GET':
+        contribuyente = request.GET.get('query')
+        if contribuyente is not None:
+            contrib_filter = Contribuyente.objects.filter(
+                Q(id_contrato__icontains=contribuyente) |
+                Q(num_identificacion__startswith=contribuyente) |
+                Q(nombre__icontains=contribuyente) |
+                Q(telf__startswith=contribuyente) |
+                Q(email__icontains=contribuyente) |
+                Q(representante__icontains=contribuyente) |
+                Q(cedula_rep__startswith=contribuyente)).order_by('-nombre')
+
+    contrib_json = simplejson.dumps({'result':list(contrib_filter)})
+    return HttpResponse(contrib_json, mimetype='application/javascript')

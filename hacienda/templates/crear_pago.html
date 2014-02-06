@@ -175,7 +175,7 @@
 										<div class="row-fluid">
 											<label class="control-label" for="form-field-select-3">Contribuyente</label>&nbsp; &nbsp; &nbsp;
 
-											<input id="ContribAjax" type="text" class="col-md-12 form-control" placeholder="Buscar Contrib..." autocomplete="off" />{% csrf_token %}
+											<input id="ContribAjax" type="text" class="col-md-12 form-control" placeholder="Buscar Contrib..." autocomplete="off" />
 											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Autocompletado a partir de 4 caracteres." title="Contribuyente">?</span>
 										</div>
 									</div>
@@ -200,18 +200,17 @@
 										</div>
 									</div>
 									<div class="control-group">
-                                            <label class="control-label" for="form-field-select-4">Impuestos</label>
+										<div class="row-fluid">
+	                                        <label class="control-label" for="form-field-select-4">Impuestos</label>
 											<div class="controls">
-												<div class="row-fluid input-append">
 
-                                                        <select multiple="" class="chzn-select" id="form-field-select-4" data-placeholder="Choose a Country...">
-                                                        {% for impuesto in impuestos %}
-                                                            <option value="{{ impuesto.id}}" />{{impuesto.codigo}} {{ impuesto.descripcion }}</option>
-                                                            {% endfor %}
-                                                        </select>
-                                                </div>
-                                            </div>
-                
+                                                <select multiple="" class="chzn-select" id="form-field-select-4" data-placeholder="Seleccione impuestos...">
+                                                {% for impuesto in impuestos %}
+                                                    <option value="{{ impuesto.id}}" />{{impuesto.codigo}} {{ impuesto.descripcion }}</option>
+                                                {% endfor %}
+                                                </select>
+	                                        </div>
+                                        </div>
                                     </div>
 
 									<div class="control-group">
@@ -569,8 +568,11 @@
 				$('#ContribAjax').typeahead({
                     ajax: {
                         url: '/contrib/ajax_contrib/',
-                        method: 'post',
-                        triggerLength: 4
+                        method: 'get',
+                        triggerLength: 4,
+                        loadingClass: "loading-circle",
+                        timeout: 500,
+                        source: []
                     },
                 });
 			
