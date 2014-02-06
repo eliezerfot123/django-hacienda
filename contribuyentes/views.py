@@ -17,18 +17,6 @@ class LiquidacionWizard(SessionWizardView):
     form_list = [ImpuestosForm, RubrosForm, LiquidacionForm]
     template_name = 'crear_pago.html'
 
-    def get_form_initial(self, step):
-        # steps are named 'step1', 'step2', 'step3'
-        current_step = self.storage.current_step
-        # get the data for step 1 on step 3
-        if current_step == 'step1':
-            prev_data = self.storage.get_step_data('step1')
-            get_contrib = prev_data.get('step1-contrib','')
-
-            return self.initial_dict.get(step, {'contrib': get_contrib})
-
-        return self.initial_dict.get(step, {})
-
     def get_form(self, step=None, data=None, files=None):
         formu = super(LiquidacionWizard, self).get_form(step, data, files)
 
@@ -36,15 +24,24 @@ class LiquidacionWizard(SessionWizardView):
             step = self.steps.current
 
         if step == '1':
-            if formu.fields['contrib'] is not None:
-                formu.fields['contrib'].queryset = self.query
-                print(formu)
+            formu.fields['rubros'].queryset = self.query
         return formu
 
-    def process_step(self, request, form, step):
+    def process_step(self, form):
 
-        if step=='0':
-            self.query = Contribuyente.objects.filter(Q(pk=form.cleaned_data['contrib'].pk)).distinct()
+        if self.steps.current == '0':
+            contribuyente = form.cleaned_data['contrib']
+            import pdb
+            pdb.set_trace()
+
+            self.query = Contribuyente.objects.filter(
+                Q(id_contrato__icontains=contribuyente) |
+                Q(num_identificacion__startswith=contribuyente) |
+                Q(nombre__icontains=contribuyente) |
+                Q(telf__startswith=contribuyente) |
+                Q(email__icontains=contribuyente) |
+                Q(representante__icontains=contribuyente) |
+                Q(cedula_rep__startswith=contribuyente)).order_by('rubro')
 
     def done(self, form_list, **kwargs):
         do_something_with_the_form_data(form_list)

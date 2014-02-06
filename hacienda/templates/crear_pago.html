@@ -194,9 +194,31 @@
 								</div>
 								<hr></hr>
 
-								{% block formulario %} 
-							            {{ wizard.management_form }}
-								<form class="form-horizontal" />{% csrf_token %}
+
+    <form action="." method="post" >{% csrf_token %} 
+    {{ previous_fields|safe }}
+            {{ wizard.management_form }}
+    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+
+        <!--En la tabla se formatean automaticamente los campo del formulario-->
+        <table>
+            <tr>
+                {{form}}
+            </tr>
+        </table>
+
+        <div class="submit-row"> <!--Clase para los estilos de los botones-->
+            <center>
+            <br><br><input type="submit" value="{% if step < step_count %}Siguiente {% else %} Generar Reporte {% endif %}" class="boton"/>
+            </center>
+        </div>
+
+    </form>
+
+
+
+								{% block formulario %}
+								<form class="form-horizontal" method="post" action="." />{% csrf_token %}
 									{{ previous_fields|safe }}
 								    	{{ wizard.management_form }}
 								    	<input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
@@ -274,12 +296,13 @@
 											<button type="submit" value="{{ wizard.steps.prev }}" class="btn btn-success btn-next"/>
 												Anterior
 											</button>
-										</div>
+										
 									{% endif %}
-										<button type="submit" class="btn btn-success btn-small btn-next" data-last="Finish ">
+										<button type="submit" class="btn btn-success btn-next" data-last="Finish ">
 											{% if wizard.steps.step1 < wizard.steps.count %} Siguiente {% else %} Generar {% endif %}
 											<i class="icon-arrow-right icon-on-right"></i>
 										</button>
+										</div>
 									</div>
 								</form>
 							</div>
@@ -594,7 +617,7 @@
 				})
 				*/
 
-				$('.ContribAjax').typeahead({
+				$('#id_0-contrib').typeahead({
                     ajax: {
                         url: '/contrib/ajax_contrib/',
                         method: 'get',
