@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url('^login/', include('login.urls')),
     url('^reporte/', include('reportes.urls')),
     url('^contrib/', include('contribuyentes.urls')),
+    url(r'^liquidacion', include('liquidaciones.urls')),
     url(r'^sdr/$', 'contribuyentes.views.lista_contribuyentes'),
     url(r'^$', 'login.views.home', name='home'),
 )
