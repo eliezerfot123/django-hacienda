@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from contribuyentes.models import Contribuyente
 
 
 class Impuesto(models.Model):
@@ -26,7 +27,6 @@ class Liquidacion(models.Model):
 
 
 class Pago(models.Model):
-    from contribuyentes.models import Contribuyente
 
     liquidacion=models.ForeignKey(Liquidacion,null=True)
     num_liquidacion=models.CharField(null=True,max_length=20)
@@ -39,5 +39,5 @@ class Pago(models.Model):
     impuesto=models.FloatField()
     recargo=models.FloatField(null=True,default=0.0)
     intereses=models.FloatField(null=True,default=0.0)
-    fecha_pago=models.DateField()
+    fecha_pago=models.DateField(null=True,blank=True)
     observaciones=models.TextField(null=True)
