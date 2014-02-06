@@ -149,17 +149,17 @@
 								<i class="icon-angle-right arrow-icon"></i>
 							</span>
 						</li>
-						<li class="active">Pagos</li>
+						<li class="active">Liquidación</li>
 					</ul><!--.breadcrumb-->
 				</div>
 
 				<div class="page-content">
 					<div class="page-header position-relative">
 						<h1>
-							Pagos
+							Liquidaciones
 							<small>
 								<i class="icon-double-angle-right"></i>
-								Cargar pago
+								Cargar liquidaciones
 							</small>
 						</h1>
 					</div><!--/.page-header-->
@@ -167,27 +167,59 @@
 						<div class="span12">
 							<!--PAGE CONTENT BEGINS-->
 							<div class="row-fluid">
-								<h3 class="header smaller lighter blue">Cargar nuevo pago</h3>
-								
+								<h3 class="header smaller lighter blue">Cargar nueva liquidación</h3>
 
+								<div id="fuelux-wizard" class="row-fluid hide" data-target="#step-container">
+									<ul class="wizard-steps">
+										<li data-target="#step1" class="active">
+											<span class="step">1</span>
+											<span class="title">Impuestos</span>
+										</li>
+
+										<li data-target="#step2">
+											<span class="step">2</span>
+											<span class="title">Rubros</span>
+										</li>
+
+										<li data-target="#step3">
+											<span class="step">3</span>
+											<span class="title">Liquidación</span>
+										</li>
+
+										<li data-target="#step4">
+											<span class="step">4</span>
+											<span class="title">Imprimir Vauche/Liquidación</span>
+										</li>
+									</ul>
+								</div>
+								<hr></hr>
+								{% block formulario %} 
+							            {{ wizard.management_form }}
+								    <form action="." method="post" >{% csrf_token %} 
+								    {{ previous_fields|safe }}
+								            {{ wizard.management_form }}
+								    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+								        <table>
+								            <tr>
+								                {{form}}
+								            </tr>
+								        </table>
+
+								        <div class="submit-row">
+								            <center>
+								            <br><br><input type="submit" value="{% if step < step_count %}Siguiente {% else %} Generar Reporte {% endif %}" class="boton"/>
+								            </center>
+								        </div>
+
+								    </form>
+								{% endblock %}
 								<form class="form-horizontal" />
 									<div class="control-group">
 										<div class="row-fluid">
 											<label class="control-label" for="form-field-select-3">Contribuyente</label>&nbsp; &nbsp; &nbsp;
 
-											<input id="ContribAjax" type="text" class="col-md-12 form-control" placeholder="Buscar Contrib..." autocomplete="off" />
+											<input id="ContribAjax" type="text" class="col-md-12 form-control span5" placeholder="Buscar Contrib..." autocomplete="off" />
 											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Autocompletado a partir de 4 caracteres." title="Contribuyente">?</span>
-										</div>
-									</div>
-
-									<div class="control-group">
-										<div class="row-fluid">
-											<label class="control-label" for="form-field-select-3">Liquidación</label>&nbsp; &nbsp; &nbsp;
-
-											<select class="chzn-select" id="form-field-select-3" data-placeholder="Seleccione Liquidación...">
-												<option value="" />
-												<option value="AL" />Alabama
-											</select>
 										</div>
 									</div>
 
@@ -195,7 +227,7 @@
 										<label class="control-label" for="form-field-6">N° Deposito</label>
 
 										<div class="controls">
-											<input data-rel="tooltip" type="text" id="form-field-6" placeholder="Deposito" title="" data-placement="bottom" />
+											<input data-rel="tooltip" class="span3" type="text" id="form-field-6" placeholder="Deposito" title="" data-placement="bottom" />
 											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese el número de deposito del banco." title="Deposito">?</span>
 										</div>
 									</div>
@@ -204,11 +236,12 @@
 	                                        <label class="control-label" for="form-field-select-4">Impuestos</label>
 											<div class="controls">
 
-                                                <select multiple="" class="chzn-select" id="form-field-select-4" data-placeholder="Seleccione impuestos...">
+                                                <select multiple="" class="chzn-select span4" id="form-field-select-4" data-placeholder="Seleccione impuestos...">
                                                 {% for impuesto in impuestos %}
                                                     <option value="{{ impuesto.id}}" />{{impuesto.codigo}} {{ impuesto.descripcion }}</option>
                                                 {% endfor %}
                                                 </select>
+                                                <span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Seleccione los impuestos." title="Impuestos">?</span>
 	                                        </div>
                                         </div>
                                     </div>
@@ -224,6 +257,7 @@
 													<span class="add-on">
 														<i class="icon-calendar"></i>
 													</span>
+													<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Seleccione la fecha de pago (Opcional)." title="Fecha Pago">?</span>
 												</div>
 											</div>
 										</div>
@@ -238,18 +272,10 @@
 										</div>
 									</div>
 
-									<div class="form-actions">
-									<button class="btn btn-info" type="submit">
-										<i class="icon-ok bigger-110"></i>
-										Cargar
-									</button>
-
-									&nbsp; &nbsp; &nbsp;
-									<button class="btn" type="reset">
-										<i class="icon-undo bigger-110"></i>
-										Limpiar
-									</button>
-								</div>
+									<div class="row-fluid wizard-actions">
+										<button type="submit" value="{% if step < step_count %}Siguiente {% else %} Crear {% endif %}" class="btn btn-success btn-next"/>
+										</button>
+									</div>
 								</form>
 							</div>
 						</div><!--/.span-->
@@ -330,7 +356,6 @@
 						inp.value="This text field is disabled!";
 					}
 				});
-			
 			
 				$(".chzn-select").chosen(); 
 				
@@ -576,6 +601,22 @@
                         source: []
                     },
                 });
+
+
+				var $validation = false;
+				$('#fuelux-wizard').ace_wizard().on('change' , function(e, info){
+					if(info.step == 1 && $validation) {
+						if(!$('#validation-form').valid()) return false;
+					}
+				}).on('finished', function(e) {
+					bootbox.dialog("Thank you! Your information was successfully saved!", [{
+						"label" : "OK",
+						"class" : "btn-small btn-primary",
+						}]
+					);
+				}).on('stepclick', function(e){
+					//return false;//prevent clicking on steps
+				});
 			
 			});
 		</script>
