@@ -90,6 +90,6 @@ def ajax_contrib(request):
                 Q(representante__icontains=contribuyente) |
                 Q(cedula_rep__istartswith=contribuyente)).values_list('pk','id_contrato','num_identificacion','nombre').order_by('-nombre')
 
-    contrib=[({'id':p[0], 'nombre': '{0} {1} {2}'.format( p[1], p[2],p[3]),}) for p in contrib_filter]
+    contrib=[({'id':p[0], 'nombre': u'{0} {1} {2}'.format( p[1], p[2],p[3]),}) for p in contrib_filter]
     contrib_json = json.dumps(contrib)
     return HttpResponse(contrib_json, mimetype='application/javascript')
