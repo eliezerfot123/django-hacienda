@@ -24,24 +24,23 @@ class LiquidacionWizard(SessionWizardView):
             step = self.steps.current
 
         if step == '1':
-            formu.fields['rubros'].queryset = self.query
+            try:
+                formu.fields['rubros'].queryset = self.query
+            except:
+                pass
         return formu
 
     def process_step(self, form):
 
         if self.steps.current == '0':
-            contribuyente = form.cleaned_data['contrib']
-            import pdb
-            pdb.set_trace()
+            self.contrib = form.cleaned_data['contrib']
+            self.impuesto = form.cleaned_data['impuesto']
 
-            self.query = Contribuyente.objects.filter(
-                Q(id_contrato__icontains=contribuyente) |
-                Q(num_identificacion__startswith=contribuyente) |
-                Q(nombre__icontains=contribuyente) |
-                Q(telf__startswith=contribuyente) |
-                Q(email__icontains=contribuyente) |
-                Q(representante__icontains=contribuyente) |
-                Q(cedula_rep__startswith=contribuyente)).order_by('rubro')
+            contrib = Contribuyente.objects.filter(num_identificacion=self.contrib.split(" ")[1]
+                                                  )
+            self.query = Rubro.objects.filter(contribuyente=contrib[0].pk)
+
+        return self.get_form_step_data(form)
 
     def done(self, form_list, **kwargs):
         do_something_with_the_form_data(form_list)

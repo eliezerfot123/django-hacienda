@@ -194,43 +194,55 @@
 								</div>
 								<hr></hr>
 
-
-    <form action="." method="post" >{% csrf_token %} 
-    {{ previous_fields|safe }}
-            {{ wizard.management_form }}
-    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
-
-        <!--En la tabla se formatean automaticamente los campo del formulario-->
-        <table>
-            <tr>
-                {{form}}
-            </tr>
-        </table>
-
-        <div class="submit-row"> <!--Clase para los estilos de los botones-->
-            <center>
-            <br><br><input type="submit" value="{% if step < step_count %}Siguiente {% else %} Generar Reporte {% endif %}" class="boton"/>
-            </center>
-        </div>
-
-    </form>
-
-
-
 								{% block formulario %}
+								    <form action="." method="post" >{% csrf_token %} 
+								    {{ previous_fields|safe }}
+								            {{ wizard.management_form }}
+								    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+
+								        <!--En la tabla se formatean automaticamente los campo del formulario-->
+								        <table>
+								            <tr>
+								            	{% if form.rubros %}
+								            		{% for rubro in form.rubros %}
+								                			{{form.rubros.label}}: {{form.rubros}}
+								            		{% endfor %}
+								            		
+								            	{% else %}
+								            		{{form}}
+								            	{% endif %}
+								            </tr>
+								        </table>
+
+								        <p>Paso {{ wizard.steps.step1 }} de {{ wizard.steps.count }}</p>
+									<div class="modal-footer wizard-actions">
+									{% if wizard.steps.prev %}
+										<div class="row-fluid wizard-actions">
+											<button value="{{ wizard.steps.first }}" class="btn btn-success btn-next"/>
+												Primero
+											</button>
+											<button value="{{ wizard.steps.prev }}" class="btn btn-success btn-next"/>
+												Anterior
+											</button>
+										
+									{% endif %}
+										<button type="submit" class="btn btn-success btn-next" data-last="Finish ">
+											{% if wizard.steps.step1 < wizard.steps.count %} Siguiente {% else %} Generar {% endif %}
+											<i class="icon-arrow-right icon-on-right"></i>
+										</button>
+										</div>
+									</div>
+								    </form>
+								{% endblock %}
+
+
+								{% block formulario1 %}
 								<form class="form-horizontal" method="post" action="." />{% csrf_token %}
 									{{ previous_fields|safe }}
 								    	{{ wizard.management_form }}
 								    	<input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
-								    	{% if wizard.steps.current == '0' %} <!--Primer formulario-->
-									<div class="control-group">
-										<div class="row-fluid">
-											<label class="control-label" for="form-field-select-3">Contribuyente</label>&nbsp; &nbsp; &nbsp;
-											<!--{{form.contrib.auto_id}}-->
-											<input id="{{form.contrib.auto_id}}" name="{{ form.contrib.auto_name }}" type="text" class="ContribAjax col-md-12 form-control span5" placeholder="Buscar Contrib..." autocomplete="off" />
-											<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Autocompletado a partir de 4 caracteres." title="Contribuyente">?</span>
-										</div>
-									</div>
+								    	{% if wizard.steps.current == '3' %} <!--Primer formulario-->
+									
 									<div class="control-group">
 										<div class="row-fluid">
 	                                        <label class="control-label" for="form-field-select-4">Impuestos</label>
@@ -247,7 +259,7 @@
                                     </div>
 										{% endif %}
 
-										{% if wizard.steps.current == '1' %} <!--Segundo formulario-->
+										{% if wizard.steps.current == '3' %} <!--Segundo formulario-->
 											<div class="control-group">
 												<div class="row-fluid">
 			                                        <label class="control-label" for="form-field-select-4">Rubros</label>
@@ -264,7 +276,7 @@
 		                                    </div>
 										{% endif %}
 
-										{% if wizard.steps.current == '2' %} <!--Tercer formulario-->
+										{% if wizard.steps.current == '3' %} <!--Tercer formulario-->
 										<div class="control-group">
 											<label class="control-label" for="form-field-6">N° Deposito</label>
 
@@ -286,24 +298,7 @@
 								{% endblock %}
 
 									
-									<p>Paso {{ wizard.steps.step1 }} de {{ wizard.steps.count }}</p>
-									<div class="modal-footer wizard-actions">
-									{% if wizard.steps.prev %}
-										<div class="row-fluid wizard-actions">
-											<button type="submit" value="{{ wizard.steps.first }}" class="btn btn-success btn-next"/>
-												Primero
-											</button>
-											<button type="submit" value="{{ wizard.steps.prev }}" class="btn btn-success btn-next"/>
-												Anterior
-											</button>
-										
-									{% endif %}
-										<button type="submit" class="btn btn-success btn-next" data-last="Finish ">
-											{% if wizard.steps.step1 < wizard.steps.count %} Siguiente {% else %} Generar {% endif %}
-											<i class="icon-arrow-right icon-on-right"></i>
-										</button>
-										</div>
-									</div>
+									
 								</form>
 							</div>
 						</div><!--/.span-->
@@ -625,7 +620,6 @@
                         loadingClass: "loading-circle",
                         displayField: 'nombre',
                         timeout: 500,
-                        source: []
                     },
                 });
 
