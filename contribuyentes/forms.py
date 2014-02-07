@@ -66,7 +66,6 @@ class RubrosForm(forms.Form):  # [1]
 
 
 class LiquidacionForm(forms.Form):  # [2]
-    nDeposito = forms.IntegerField()
+    numero = forms.IntegerField()
     observaciones = forms.CharField(widget=forms.Textarea)
-    trimestres = forms.IntegerField()
-
+    trimestre = forms.IntegerField()

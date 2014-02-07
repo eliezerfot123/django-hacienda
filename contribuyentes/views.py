@@ -28,6 +28,7 @@ class LiquidacionWizard(SessionWizardView):
                 formu.fields['rubros'].queryset = self.query
             except:
                 pass
+
         return formu
 
     def process_step(self, form):
@@ -36,9 +37,10 @@ class LiquidacionWizard(SessionWizardView):
             self.contrib = form.cleaned_data['contrib']
             self.impuesto = form.cleaned_data['impuesto']
 
-            contrib = Contribuyente.objects.filter(num_identificacion=self.contrib.split(" ")[1]
-                                                  )
-            self.query = Rubro.objects.filter(contribuyente=contrib[0].pk)
+            self.query = Rubro.objects.filter(contribuyente__num_identificacion=self.contrib.split(" ")[1])
+
+        if self.steps.current == '1':
+            self.montos = form.cleaned_data['rubros']
 
         return self.get_form_step_data(form)
 

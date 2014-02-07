@@ -171,6 +171,7 @@
 
 								<div id="fuelux-wizard" class="row-fluid hide" data-target="#step-container">
 									<ul class="wizard-steps">
+										{% if wizard.steps.current == '0' %}
 										<li data-target="#step1" class="active">
 											<span class="step">1</span>
 											<span class="title">Impuestos</span>
@@ -190,6 +191,67 @@
 											<span class="step">4</span>
 											<span class="title">Imprimir Vauche/Liquidación</span>
 										</li>
+										{% elif wizard.steps.current == '1' %}
+										<li data-target="#step1">
+											<span class="step">1</span>
+											<span class="title">Impuestos</span>
+										</li>
+
+										<li data-target="#step2" class="active">
+											<span class="step">2</span>
+											<span class="title">Rubros</span>
+										</li>
+
+										<li data-target="#step3">
+											<span class="step">3</span>
+											<span class="title">Liquidación</span>
+										</li>
+
+										<li data-target="#step4">
+											<span class="step">4</span>
+											<span class="title">Imprimir Vauche/Liquidación</span>
+										</li>
+										{% elif wizard.steps.current == '2' %}
+										<li data-target="#step1">
+											<span class="step">1</span>
+											<span class="title">Impuestos</span>
+										</li>
+
+										<li data-target="#step2">
+											<span class="step">2</span>
+											<span class="title">Rubros</span>
+										</li>
+
+										<li data-target="#step3" class="active">
+											<span class="step">3</span>
+											<span class="title">Liquidación</span>
+										</li>
+
+										<li data-target="#step4">
+											<span class="step">4</span>
+											<span class="title">Imprimir Vauche/Liquidación</span>
+										</li>
+										{% else %}
+										<li data-target="#step1" class="active">
+											<span class="step">1</span>
+											<span class="title">Impuestos</span>
+										</li>
+
+										<li data-target="#step2">
+											<span class="step">2</span>
+											<span class="title">Rubros</span>
+										</li>
+
+										<li data-target="#step3">
+											<span class="step">3</span>
+											<span class="title">Liquidación</span>
+										</li>
+
+										<li data-target="#step4" class="active">
+											<span class="step">4</span>
+											<span class="title">Imprimir Vauche/Liquidación</span>
+										</li>
+										{% endif %}
 									</ul>
 								</div>
 								<hr></hr>
@@ -235,47 +297,6 @@
 								    </form>
 								{% endblock %}
 
-
-								{% block formulario1 %}
-								<form class="form-horizontal" method="post" action="." />{% csrf_token %}
-									{{ previous_fields|safe }}
-								    	{{ wizard.management_form }}
-								    	<input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
-								    	{% if wizard.steps.current == '3' %} <!--Primer formulario-->
-									
-									<div class="control-group">
-										<div class="row-fluid">
-	                                        <label class="control-label" for="form-field-select-4">Impuestos</label>
-											<div class="controls">
-
-                                                <select multiple="" name="{{ form.impuesto.auto_name }}" class="chzn-select span4" id="form-field-select-4" data-placeholder="Seleccione impuestos...">
-                                                {% for id, dato in form.fields.impuesto.choices %}
-                                                    <option value="{{ id }}" />{{ dato}}</option>
-                                                {% endfor %}
-                                                </select>
-                                                <span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Seleccione los impuestos." title="Impuestos">?</span>
-	                                        </div>
-                                        </div>
-                                    </div>
-										{% endif %}
-
-										{% if wizard.steps.current == '3' %} <!--Segundo formulario-->
-											<div class="control-group">
-												<div class="row-fluid">
-			                                        <label class="control-label" for="form-field-select-4">Rubros</label>
-													<div class="controls">
-
-		                                                <select multiple="" name="{{ form.rubros.auto_name }}" class="chzn-select span4" id="form-field-select-4" data-placeholder="Seleccione impuestos...">
-		                                                {% for id, datos in form.fields.rubros.choices %}
-		                                                    <option value="{{ id }}" />{{ datos }}</option>
-		                                                {% endfor %}
-		                                                </select>
-		                                                <span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Seleccione los rubros." title="Rubros">?</span>
-			                                        </div>
-		                                        </div>
-		                                    </div>
-										{% endif %}
-
 										{% if wizard.steps.current == '3' %} <!--Tercer formulario-->
 										<div class="control-group">
 											<label class="control-label" for="form-field-6">N° Deposito</label>
@@ -295,9 +316,6 @@
 											</div>
 										</div>
 										{% endif %}
-								{% endblock %}
-
-									
 									
 								</form>
 							</div>
