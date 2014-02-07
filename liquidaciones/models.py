@@ -24,6 +24,14 @@ class Liquidacion(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.numero, self.monto)
+    
+    def as_dict(self):
+        import pdb
+        pdb.set_trace()
+        return {
+            "name": "%s %s %s"%( self.numero,self.monto,self.pago_set.all()),
+            "pk": self.pk,
+        }
 
 
 class Pago(models.Model):
