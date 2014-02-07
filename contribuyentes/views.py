@@ -16,6 +16,11 @@ from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm
 class LiquidacionWizard(SessionWizardView):
     form_list = [ImpuestosForm, RubrosForm, LiquidacionForm]
     template_name = 'crear_pago.html'
+    contrib=None
+    impuesto=None
+    query=None
+    montos=None
+
 
     def get_form(self, step=None, data=None, files=None):
         formu = super(LiquidacionWizard, self).get_form(step, data, files)
@@ -23,24 +28,24 @@ class LiquidacionWizard(SessionWizardView):
         if step is None:
             step = self.steps.current
 
-        if step == '1':
-            try:
-                formu.fields['rubros'].queryset = self.query
-            except:
-                pass
+        if step == '1' and data is None:
+            formu.fields['rubros'].queryset = self.query
+        elif step=='2' and data is None:
+            formu.fields['trimestre'].choices=[self.montos]
 
         return formu
-
     def process_step(self, form):
 
         if self.steps.current == '0':
             self.contrib = form.cleaned_data['contrib']
             self.impuesto = form.cleaned_data['impuesto']
-
             self.query = Rubro.objects.filter(contribuyente__num_identificacion=self.contrib.split(" ")[1])
 
-        if self.steps.current == '1':
-            self.montos = form.cleaned_data['rubros']
+        elif self.steps.current == '1':
+            subtotal=0.0
+            for rubroid,subtotales in form.cleaned_data['rubros'].iteritems():
+                subtotal+=float(subtotales)
+            self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':subtotal})
 
         return self.get_form_step_data(form)
 
