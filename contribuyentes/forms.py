@@ -81,8 +81,8 @@ class RubrosForm(forms.Form):  # [1]
         subtotales={}
         for (rubroid,monto) in self.cleaned_data.get('rubros').iteritems():
             rubro=Rubro.objects.get(id=rubroid)
-            montout=int(monto)*(rubro.ut*107)
-            montoali=int(monto)*rubro.alicuota
+            montout=float(rubro.ut)*107
+            montoali=float(monto)*rubro.alicuota
             if montout>montoali:
                 subtotales[rubroid]=montout
 

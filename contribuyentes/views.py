@@ -28,13 +28,14 @@ class LiquidacionWizard(SessionWizardView):
         if step is None:
             step = self.steps.current
 
-        if step == '1' and data is None:
+        if step == '1' :
             formu.fields['rubros'].queryset = self.query
-        elif step=='2' and data is None:
+        elif step=='2' :
             formu.fields['trimestre'].choices=[self.montos]
 
         return formu
     def process_step(self, form):
+
 
         if self.steps.current == '0':
             self.contrib = form.cleaned_data['contrib']
