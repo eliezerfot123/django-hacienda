@@ -111,20 +111,22 @@ class TrimestresWidget(forms.widgets.Select):
     def render(self, name, value, attrs=None, choices=()):
         from django.utils.safestring import mark_safe
         from itertools import chain
+        import locale
+        locale.setlocale( locale.LC_ALL, '' )
         if value is None: value = ''
         output = ['<div class="span12">']
         output.append('<table id="sample-table-1" class="table table-striped table-bordered table-hover">')
-        output.append('<thead><tr><th>C&oacute;digo</th><th>Impuesto</th>  <th>Monto</th><th>Recargo</th> <th>Intereses</th> <th>Subtotal</th><th>Trimestres</th></tr></thead>')
+        output.append('<thead><tr><th>C&oacute;digo</th><th>Impuesto</th>  <th>Monto</th><th>Recargo</th> <th>Intereses</th> <th>Subtotal</th><th>Trimestres</th><th>% Descuento</th></tr></thead>')
         num = 0
         output.append('<tbody>')
         for  impuesto in self.choices:
             num = num + 1
-            output.append('<tr><td>%s</td><td>%s</td><td>%s</td><td>0</td><td>0</td><td>%s</td><td><select name="impuesto-%s">"'% (impuesto['impuesto'].codigo,impuesto['impuesto'].descripcion,impuesto['montos'] ,impuesto['montos'],impuesto['impuesto'].codigo))
-            for trim in range(1,5):
+            output.append('<tr><td>%(codigo)s</td><td>%(descripcion)s</td><td>%(monto)s</td><td>0</td><td>0</td><td>%(monto)s</td><td><div class="controls"><select name="trimestres-%(codigo)s">"'% ({'codigo':impuesto['impuesto'].codigo,'descripcion':impuesto['impuesto'].descripcion,'monto':locale.currency(impuesto['montos'],grouping=True)} ))
+            for trim in range(4,0,-1):
                 output.append('<option value="%d">%d</option>'%(trim,trim))
 
             
-            output.append('</select></td></tr>' )
+            output.append('</select></div></td><td><div class="controls"><input name="descuento-%s" type="text" value="0"/></div></tr>' )
 
         output.append('<tbody>')
         output.append('</table>')
@@ -143,5 +145,5 @@ class TrimestresField(ModelChoiceField):
 
 class LiquidacionForm(forms.Form):  # [2]
     trimestre = TrimestresField(queryset=None,required=True)
-    numero = forms.IntegerField()
+    numero = forms.CharField(label="Nro. Deposito/Cheque")
     observaciones = forms.CharField(widget=forms.Textarea)
