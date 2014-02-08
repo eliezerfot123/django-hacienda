@@ -105,7 +105,7 @@ class TrimestresWidget(forms.widgets.Select):
         import string
         impuestos= {}
         for campo, valor in data.iteritems():
-            if campo.find('descuento-') > -1 or campo.find('trimestres-') > -1:
+            if campo.find('descuento-') > -1 or campo.find('trimestres-') > -1 or campo.find('monto-') > -1:
                 impuesto=string.split(campo, '-')
                 #impuestos.update({data[1]:{[data[0]]:valor}})
                 if not impuesto[1] in impuestos.keys():
@@ -118,23 +118,21 @@ class TrimestresWidget(forms.widgets.Select):
     def render(self, name, value, attrs=None, choices=()):
         from django.utils.safestring import mark_safe
         from itertools import chain
-        import locale
-        locale.setlocale( locale.LC_ALL, '' )
         if value is None: value = ''
         output = ['<div class="span12">']
         output.append('<table id="sample-table-1" class="table table-striped table-bordered table-hover">')
-        output.append('<thead><tr><th>C&oacute;digo</th><th>Impuesto</th>  <th>Monto</th><th>Recargo</th> <th>Intereses</th> <th>Subtotal</th><th>Trimestres</th><th>% Descuento</th></tr></thead>')
+        output.append('<thead><tr><th>C&oacute;digo</th><th>Impuesto</th>  <th>Monto</th><th>Recargo</th> <th>Intereses</th><th>Trimestres</th><th>% Descuento</th> <th>Subtotal</th></tr></thead>')
         num = 0
         output.append('<tbody>')
         if not self.choices[0] is  None:
             for  impuesto in self.choices:
                 num = num + 1
-                output.append('<tr><td>%(codigo)s</td><td>%(descripcion)s</td><td>%(monto)s</td><td>0</td><td>0</td><td>%(monto)s</td><td><div class="controls"><select name="trimestres-%(codigo)s">"'% ({'codigo':impuesto['impuesto'].codigo,'descripcion':impuesto['impuesto'].descripcion,'monto':locale.currency(impuesto['montos'],grouping=True)} ))
+                output.append('<tr><td>%(codigo)s</td><td>%(descripcion)s</td><td>%(monto)s BsF.<input type="hidden" name="monto-%(codigo)s" value="%(monto)s"/> </td><td><input type="text" value="0" name="recargo-%(codigo)s" style="width: 60px" /></td><td><input type="text" style="width: 60px" value="0" name="intereses-%(codigo)s" /></td><td><div class="controls"><select  style="width: 60px" name="trimestres-%(codigo)s">"'% ({'codigo':impuesto['impuesto'].codigo,'descripcion':impuesto['impuesto'].descripcion,'monto':impuesto['montos']} ))
                 for trim in range(4,0,-1):
                     output.append('<option value="%(trimestre)s">%(trimestre)s</option>'%({'trimestre':trim}))
 
             
-                output.append('</select></div></td><td><div class="controls"><input name="descuento-%(impuesto)s" type="text" value="0"/></div></tr>'%({'impuesto':impuesto['impuesto'].codigo} ))
+                output.append('</select></div></td><td><div class="controls"><input name="descuento-%(impuesto)s" type="text"  style="width: 60px" value="0"/></div></td><td>%(monto)s BsF.</td></tr>'%({'impuesto':impuesto['impuesto'].codigo,'monto':impuesto['montos']} ))
 
             output.append('<tbody>')
             output.append('</table>')
@@ -152,6 +150,6 @@ class TrimestresField(ModelChoiceField):
 
 
 class LiquidacionForm(forms.Form):  # [2]
-    trimestre = TrimestresField(queryset=None,required=True)
+    trimestre = TrimestresField(queryset=None,required=True,label="")
     numero = forms.CharField(label="Nro. Deposito/Cheque")
     observaciones = forms.CharField(widget=forms.Textarea)
