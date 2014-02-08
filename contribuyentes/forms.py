@@ -8,7 +8,7 @@ from django.forms import ModelForm, TextInput, Textarea,Select,DateInput
 
 from django.forms.models import ModelChoiceField
 
-from contribuyentes.models import Rubro
+from contribuyentes.models import Rubro,Contribuyente
 
 
 class ImpuestosForm(forms.Form):  # [0]
@@ -24,6 +24,9 @@ class ImpuestosForm(forms.Form):  # [0]
     impuesto.widget.attrs['multiple'] = ''
     impuesto.widget.attrs['data-placeholder'] = 'Seleccione Impuestos'
     impuesto.widget.attrs['value'] = ''
+    def clean_contrib(self):
+        data=self.cleaned_data['contrib']
+        return Contribuyente.objects.get(num_identificacion=data.split(" ")[1])
 
 
 """Widget Rubros"""
@@ -102,8 +105,12 @@ class TrimestresWidget(forms.widgets.Select):
         import string
         impuestos= {}
         for campo, valor in data.iteritems():
-            if campo.find('impuesto-') > -1:
-                impuestos.update({string.split(campo, '-')[1]: valor})
+            if campo.find('descuento-') > -1 or campo.find('trimestres-') > -1:
+                impuesto=string.split(campo, '-')
+                #impuestos.update({data[1]:{[data[0]]:valor}})
+                if not impuesto[1] in impuestos.keys():
+                    impuestos[impuesto[1]]={}
+                impuestos[impuesto[1]].update({impuesto[0]:valor})
         return impuestos
     """ Cómo se va a mostrar el widget
     Retorna la lista de los estudiantes con el campo de nota
@@ -119,25 +126,26 @@ class TrimestresWidget(forms.widgets.Select):
         output.append('<thead><tr><th>C&oacute;digo</th><th>Impuesto</th>  <th>Monto</th><th>Recargo</th> <th>Intereses</th> <th>Subtotal</th><th>Trimestres</th><th>% Descuento</th></tr></thead>')
         num = 0
         output.append('<tbody>')
-        for  impuesto in self.choices:
-            num = num + 1
-            output.append('<tr><td>%(codigo)s</td><td>%(descripcion)s</td><td>%(monto)s</td><td>0</td><td>0</td><td>%(monto)s</td><td><div class="controls"><select name="trimestres-%(codigo)s">"'% ({'codigo':impuesto['impuesto'].codigo,'descripcion':impuesto['impuesto'].descripcion,'monto':locale.currency(impuesto['montos'],grouping=True)} ))
-            for trim in range(4,0,-1):
-                output.append('<option value="%d">%d</option>'%(trim,trim))
+        if not self.choices[0] is  None:
+            for  impuesto in self.choices:
+                num = num + 1
+                output.append('<tr><td>%(codigo)s</td><td>%(descripcion)s</td><td>%(monto)s</td><td>0</td><td>0</td><td>%(monto)s</td><td><div class="controls"><select name="trimestres-%(codigo)s">"'% ({'codigo':impuesto['impuesto'].codigo,'descripcion':impuesto['impuesto'].descripcion,'monto':locale.currency(impuesto['montos'],grouping=True)} ))
+                for trim in range(4,0,-1):
+                    output.append('<option value="%(trimestre)s">%(trimestre)s</option>'%({'trimestre':trim}))
 
             
-            output.append('</select></div></td><td><div class="controls"><input name="descuento-%s" type="text" value="0"/></div></tr>' )
+                output.append('</select></div></td><td><div class="controls"><input name="descuento-%(impuesto)s" type="text" value="0"/></div></tr>'%({'impuesto':impuesto['impuesto'].codigo} ))
 
-        output.append('<tbody>')
-        output.append('</table>')
-        output.append('</div>')
+            output.append('<tbody>')
+            output.append('</table>')
+            output.append('</div>')
         return mark_safe('\n'.join(output))
 
 class TrimestresField(ModelChoiceField):
     widget=TrimestresWidget
 
-    def save_form_data(self, instance, data):
-        pass
+    #def save_form_data(self, instance, data):
+    #    pass
     """ Validar la data introducida """
     def clean(self,values,initial=None):
         return  values

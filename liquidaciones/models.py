@@ -26,12 +26,39 @@ class Liquidacion(models.Model):
         return '%s - %s' % (self.numero, self.monto)
     
     def as_dict(self):
-        import pdb
-        pdb.set_trace()
         return {
             "name": "%s %s %s"%( self.numero,self.monto,self.pago_set.all()),
             "pk": self.pk,
         }
+
+class Liquidacion2(models.Model):
+    numero=models.CharField(max_length=20)
+    ano=models.IntegerField()
+    deposito=models.CharField(max_length=20)
+    modopago=models.CharField(max_length=2,choices=(('CH','Cheque'),('DP','Deposito')),default='DP')
+    fecha_pago=models.DateField(null=True)
+    emision=models.DateField()
+    liquidador=models.ForeignKey(User)
+    contribuyente=models.ForeignKey(Contribuyente)
+    vencimiento=models.DateField()
+    observaciones=models.CharField(max_length=200)
+    def save(self):
+        if not self.id:
+            self.numero='10000%03d%d'%(self.liquidador.id,Liquidacion2.objects.filter(liquidador=self.liquidador).count()+1)
+        super(Liquidacion2,self).save()
+
+class Pago2(models.Model):
+    liquidacion=models.ForeignKey(Liquidacion2)
+    impuesto=models.ForeignKey(Impuesto)
+    ut=models.FloatField(default=107)
+    descuento=models.FloatField(default=0.0)
+    trimestres=models.IntegerField(default=4)
+    intereses=models.FloatField(default=0.0)
+    recargo=models.FloatField(default=0.0)
+    monto=models.FloatField()
+
+
+
 
 
 class Pago(models.Model):

@@ -5,13 +5,12 @@ from django.template.context import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from liquidaciones.models import Pago, Liquidacion,Impuesto
+from liquidaciones.models import Pago, Liquidacion,Impuesto,Liquidacion2,Pago2
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 import json
 from django.contrib.formtools.wizard.views import SessionWizardView
 from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm
-
 
 class LiquidacionWizard(SessionWizardView):
     form_list = [ImpuestosForm, RubrosForm, LiquidacionForm]
@@ -38,21 +37,27 @@ class LiquidacionWizard(SessionWizardView):
 
 
         if self.steps.current == '0':
-            self.contrib = form.cleaned_data['contrib']
             self.impuesto = form.cleaned_data['impuesto']
-            self.query = Rubro.objects.filter(contribuyente__num_identificacion=self.contrib.split(" ")[1])
+            self.query = Rubro.objects.filter(contribuyente=form.cleaned_data['contrib'])
 
         elif self.steps.current == '1':
             subtotal=0.0
             for rubroid,subtotales in form.cleaned_data['rubros'].iteritems():
                 subtotal+=float(subtotales)
             self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':subtotal})
+            
 
         return self.get_form_step_data(form)
 
     def done(self, form_list, **kwargs):
-        do_something_with_the_form_data(form_list)
-        return render(request, 'crear_pago.html', {
+        #do_something_with_the_form_data(form_list)
+        import calendar
+        import datetime
+        liquidacion=Liquidacion2(ano=datetime.date.today().year,deposito=form_list[2].cleaned_data['numero'],emision=datetime.date.today(),contribuyente=form_list[0].cleaned_data['contrib'],vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),observaciones=form_list[2].cleaned_data['observaciones'],liquidador=self.request.user)
+        liquidacion.save()
+            
+
+        return render(self.request, 'crear_pago.html', {
             'form_data': [form.cleaned_data for form in form_list],
         })
 
