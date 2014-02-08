@@ -150,7 +150,7 @@ def liquidacion_report(request):
     elementos.append(encabezado)
     #---> Fin Encabezado <---
 
-    #Liquidacion.objects.get()
+    # liquidaciones = Liquidacion.objects.get()
 
     #---> Datos Contribuyente <---
     styleSheet2 = getSampleStyleSheet()
@@ -179,6 +179,8 @@ def liquidacion_report(request):
     estilo_tabla.alignment = TA_CENTER
     x = [
         ('BACKGROUND', (0, 0), (6, 0), colors.silver),
+        ('BACKGROUND', (0, 2), (6, 2), colors.silver),
+        ('BACKGROUND', (0, 5), (6, 5), colors.silver),
         ('BOX', (0, 5), (6, 0), 0.70, colors.black),
         ('BOX', (0, 9), (6, 0), 0.70, colors.black),
         ('TOPPADDING', (0, 0), (-1, -1), 2),
@@ -210,6 +212,11 @@ def liquidacion_report(request):
     hpago4 = Paragraph('<b>Recargo</b>', estilo_tabla)
     hpago5 = Paragraph('<b>Intereses</b>', estilo_tabla)
     hpago6 = Paragraph('<b>Sub-Total</b>', estilo_tabla)
+
+    hpago7 = Paragraph('<b>Credito Fiscal</b>', estilo_tabla)
+    hpago8 = Paragraph('<b>Descuento</b>', estilo_tabla)
+    hpago9 = Paragraph('<b>Total a Pagar(Bs.)</b>', estilo_tabla)
+    hpago10 = Paragraph('<b>Impuesto o Tasa</b>', estilo_tabla)
     # Fin Headers de la tabla
 
     tabla.append([hdatos, '', hdatos1, hdatos2, hdatos3, hdatos4, ''])
@@ -219,17 +226,32 @@ def liquidacion_report(request):
     tabla.append([hpago, hpago1, hpago2, hpago3, hpago4, hpago5, hpago6])
     tabla.append(['', '', '', '', '', '', ''])
 
+    #  for liq in liquidaciones:
+
+    tabla.append([hpago7, '', hpago8, hpago10, hpago4, hpago5, hpago9])
+    tabla.append(['', '', '', '', '', '', ''])
+
     t = Table(tabla, colWidths=(2.0*cm, 2.0*cm, 3.5*cm, 3.5*cm, 3.5*cm, 2.0*cm, 2.2*cm))
     t.setStyle(TableStyle(x))
     elementos.append(t)
     #---> Fin Tabla <---
 
     #---> Notas <---
+    styleSheetNota = getSampleStyleSheet()
+    nota = styleSheetNota['Normal']
+    nota.fontsize = 12
+    nota.fontName = 'Helvetica'
+    nota.alignment = TA_LEFT
+    nota.spaceBefore = 15
+
+    txtNota1 = Paragraph('<b>DETALLES</b> <br /> <b>DERECHO REGISTRAR</b>', nota)
+    elementos.append(txtNota1)
+
     elementos.append(Spacer(1, 10))
     styleSheet3 = getSampleStyleSheet()
     parrafo = styleSheet3['Normal']
     parrafo.fontsize = 12
-    parrafo.rightIndent = -200
+    parrafo.rightIndent = -320
     parrafo.fontName = 'Helvetica'
     parrafo.alignment = TA_CENTER
     parrafo.spaceBefore = 15
@@ -237,7 +259,7 @@ def liquidacion_report(request):
     txtNota1 = Paragraph('Evite Sanciones...Cumpla con su Ciudad...!', parrafo)
     elementos.append(txtNota1)
 
-    txtNota2 = Paragraph('Para más información dirijase a las oficinas de Rentas Municipales.', parrafo)
+    txtNota2 = Paragraph('Para más información dirijase a las oficinas de <br /> Rentas Municipales.', parrafo)
     elementos.append(txtNota2)
 
     txtNota3 = Paragraph('Atención: ING. Glendys Quiñones'+
@@ -253,17 +275,17 @@ def liquidacion_report(request):
     estilo_tabla2.fontsize = 8
     y = [
         ('BOX', (0, 0), (-1, -1), 0.50, colors.black),
-        ('FONT', (0, 0), (-1, -1), "Helvetica", 8),
+        ('VALIGN',(0,0),(0,1),'TOP'),
     ]
-    hrecibi = Paragraph('<b>VALIDACIÓN</b>', estilo_tabla2)
-    hsellos = Paragraph('<b>SELLOS</b>', estilo_tabla2)
-    hautorizada = Paragraph('<b>FIRMA FUNCIONARIO</b>', estilo_tabla2)
+    hrecibi = Paragraph('VALIDACIÓN', estilo_tabla2)
+    hsellos = Paragraph('SELLOS', estilo_tabla2)
+    hautorizada = Paragraph('FIRMA FUNCIONARIO', estilo_tabla2)
 
     tabla2 = []
     tabla2.append([hrecibi, '\n', '\n'])
     tabla2.append(['\n\n', hsellos, hautorizada])
 
-    t2 = Table(tabla2, colWidths=(3.0*cm, 3.0*cm, 4.0*cm))
+    t2 = Table(tabla2, colWidths=(3.0*cm, 2.0*cm, 6.0*cm))
     t2.setStyle(TableStyle(y))
     t2.hAlign = 'LEFT'
     elementos.append(t2)
