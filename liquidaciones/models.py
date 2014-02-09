@@ -46,6 +46,12 @@ class Liquidacion2(models.Model):
         if not self.id:
             self.numero='10000%03d%d'%(self.liquidador.id,Liquidacion2.objects.filter(liquidador=self.liquidador).count()+1)
         super(Liquidacion2,self).save()
+    
+    def as_dict(self):
+        return {
+            "name": "%s  Nro.:%s"%( self.numero,self.deposito),
+            "pk": self.pk,
+        }
 
 class Pago2(models.Model):
     liquidacion=models.ForeignKey(Liquidacion2)
