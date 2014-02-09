@@ -57,7 +57,7 @@ class LiquidacionWizard(SessionWizardView):
         liquidacion.save()
         for impuesto,pagos in form_list[2].cleaned_data['trimestre'].iteritems():
 
-            pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'])
+            pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'])
             pago.save()
 
             

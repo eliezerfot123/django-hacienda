@@ -105,7 +105,7 @@ class TrimestresWidget(forms.widgets.Select):
         import string
         impuestos= {}
         for campo, valor in data.iteritems():
-            if campo.find('descuento-') > -1 or campo.find('trimestres-') > -1 or campo.find('monto-') > -1:
+            if campo.find('descuento-') > -1 or campo.find('trimestres-') > -1 or campo.find('intereses-')>-1 or campo.find('cancelado-')>-1or campo.find('monto-') > -1 or campo.find('recargo-')>-1:
                 impuesto=string.split(campo, '-')
                 #impuestos.update({data[1]:{[data[0]]:valor}})
                 if not impuesto[1] in impuestos.keys():
@@ -132,7 +132,7 @@ class TrimestresWidget(forms.widgets.Select):
                     output.append('<option value="%(trimestre)s">%(trimestre)s</option>'%({'trimestre':trim}))
 
             
-                output.append('</select></div></td><td><div class="controls"><input name="descuento-%(impuesto)s" type="text"  style="width: 60px" value="0"/></div></td><td>%(monto)s BsF.</td></tr>'%({'impuesto':impuesto['impuesto'].codigo,'monto':impuesto['montos']} ))
+                output.append('</select></div></td><td><div class="controls"><input name="descuento-%(impuesto)s" type="text"  style="width: 60px" value="0"/></div></td><td><div id="subtotal-%(impuesto)s">%(monto)s</div> BsF.</td><input type="hidden" name="cancelado-%(impuesto)s" value="%(monto)s" /> </tr>'%({'impuesto':impuesto['impuesto'].codigo,'monto':impuesto['montos']} ))
 
             output.append('<tbody>')
             output.append('</table>')

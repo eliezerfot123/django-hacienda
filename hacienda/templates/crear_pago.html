@@ -275,7 +275,6 @@
 								            	{% endif %}
 								            </tr>
 								        </table>
-
 								        <p>Paso {{ wizard.steps.step1 }} de {{ wizard.steps.count }}</p>
 									<div class="modal-footer wizard-actions">
 									{% if wizard.steps.prev %}
@@ -333,7 +332,11 @@
 
 		<!--[if !IE]>-->
 
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script src="{% static 'assets/js/jquery-2.0.3.min.js' %}"></script>
+                                        {% if wizard.steps.current == '2' %}
+                                            <script src="{% static 'assets/js/calculos.js' %}" ></script>
+
+                                        {% endif %}
 
 		<!--<![endif]-->
 

@@ -56,6 +56,7 @@ class Pago2(models.Model):
     intereses=models.FloatField(default=0.0)
     recargo=models.FloatField(default=0.0)
     monto=models.FloatField()
+    cancelado=models.FloatField()
 
 
 
