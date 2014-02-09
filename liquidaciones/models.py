@@ -24,7 +24,7 @@ class Liquidacion(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.numero, self.monto)
-    
+
     def as_dict(self):
         return {
             "name": "%s %s %s"%( self.numero,self.monto,self.pago_set.all()),
@@ -42,6 +42,7 @@ class Liquidacion2(models.Model):
     contribuyente=models.ForeignKey(Contribuyente)
     vencimiento=models.DateField()
     observaciones=models.CharField(max_length=200)
+
     def save(self):
         if not self.id:
             self.numero='10000%03d%d'%(self.liquidador.id,Liquidacion2.objects.filter(liquidador=self.liquidador).count()+1)
@@ -52,6 +53,9 @@ class Liquidacion2(models.Model):
             "name": "%s  Nro.:%s"%( self.numero,self.deposito),
             "pk": self.pk,
         }
+
+    def __unicode__(self):
+        return '%s - %s' % (self.numero, self.contribuyente)
 
 class Pago2(models.Model):
     liquidacion=models.ForeignKey(Liquidacion2)
