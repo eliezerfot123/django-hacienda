@@ -73,7 +73,16 @@ class RubrosField(ModelChoiceField):
     """ Validar la data introducida """
     def clean(self,values,initial=None):
         return  values
-
+class ContribuyenteForm(forms.ModelForm):
+    rubro= forms.ModelMultipleChoiceField(queryset=Rubro.objects.all().order_by('codigo'),required=False,label='Rubros')
+    rubro.widget.attrs['class'] = 'chzn-select span4'
+    rubro.widget.attrs['multiple'] = ''
+    rubro.widget.attrs['data-placeholder'] = 'Seleccione Rubro'
+    rubro.widget.attrs['value'] = ''
+    class Meta:
+        model=Contribuyente
+        exclude=['id_contrato',]
+        labels={'cedula_rep':'Cédula del Representante','representante':'Representante legal','direccion':'Dirección','num_identificacion':'Cédula/RIF'  }
 
 
 class RubrosForm(forms.Form):  # [1]

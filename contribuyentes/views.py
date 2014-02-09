@@ -10,7 +10,22 @@ from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 import json
 from django.contrib.formtools.wizard.views import SessionWizardView
-from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm
+from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm,ContribuyenteForm
+from django.views.generic.edit import CreateView
+from contribuyentes.models import Contribuyente
+
+class ContribuyenteCrear(CreateView):
+    model=Contribuyente
+    template_name = 'contribuyente_crear.html'
+    form_class=ContribuyenteForm
+    success_url='.'
+    def form_valid(self,form):
+        from django.contrib import messages
+        messages.success(self.request, "Contribuyente registrado")
+        
+        return super(ContribuyenteCrear,self).form_valid(form)
+        
+
 
 class LiquidacionWizard(SessionWizardView):
     form_list = [ImpuestosForm, RubrosForm, LiquidacionForm]
