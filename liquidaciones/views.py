@@ -30,10 +30,19 @@ class JSONResponseMixin(object):
 class PagoView(FormView):
     form_class=PagoForm
     template_name = 'pagos_registrar.html'
+    success_url='/liquidacion/pagos'
+    def form_valid(self,form):
+        from django.contrib import messages
+        form.cleaned_data['liquidacion'].fecha_pago=form.cleaned_data['fecha']
+        form.cleaned_data['liquidacion'].save()
+        messages.success(self.request, "Pago registrado")
+        form=self.get_form(self.get_form_class())
+        return super(PagoView,self).form_valid(form)
 
 class LiquidacionJSON(JSONResponseMixin,ListView):
 
     def get_queryset(self,):
         query=self.request.GET['query']
-        return Liquidacion.objects.filter(Q(Q(numero__istartswith=query)|Q(pago__contribuyente__num_identificacion__icontains=query)|Q(pago__contribuyente__id_contrato__istartswith=query)),Q(pago__fecha_pago=None))
+        #return Liquidacion.objects.filter(Q(Q(numero__istartswith=query)|Q(pago__contribuyente__num_identificacion__icontains=query)|Q(pago__contribuyente__id_contrato__istartswith=query)),Q(pago__fecha_pago=None))
+        return Liquidacion2.objects.filter(Q(Q(numero__istartswith=query)|Q(contribuyente__num_identificacion__icontains=query)|Q(contribuyente__id_contrato__istartswith=query)),Q(fecha_pago=None))
 
