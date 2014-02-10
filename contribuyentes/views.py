@@ -33,8 +33,8 @@ class LiquidacionWizard(SessionWizardView):
             formu.fields['trimestre'].choices=[self.montos]
 
         return formu
-    def process_step(self, form):
 
+    def process_step(self, form):
 
         if self.steps.current == '0':
             self.impuesto = form.cleaned_data['impuesto']
@@ -45,7 +45,6 @@ class LiquidacionWizard(SessionWizardView):
             for rubroid,subtotales in form.cleaned_data['rubros'].iteritems():
                 subtotal+=float(subtotales)
             self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':subtotal})
-            
 
         return self.get_form_step_data(form)
 
@@ -60,7 +59,7 @@ class LiquidacionWizard(SessionWizardView):
             pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'])
             pago.save()
 
-            
+        return HttpResponseRedirect("/reporte/liquidacion/%s/" % liquidacion.numero)
 
         return render(self.request, 'crear_pago.html', {
             'form_data': [form.cleaned_data for form in form_list],
