@@ -15,7 +15,8 @@ class Command(BaseCommand):
         make_option('--liquidacion',action='store',nargs=1,dest='liquidacion',help='Importar liquidaciones'),
         make_option('--licencia',action='store',nargs=1,dest='licencia',help='Importar licencia'),
         make_option('--pago',action='store',nargs=1,dest='pagos',help='Importar pagos'),
-        make_option('--estimadas',action='store',nargs=1,dest='estimadas',help='Importar Montos estimados'),
+        make_option('--estimada',action='store',nargs=1,dest='estimadas',help='Importar Montos estimados'),
+        make_option('--definitiva',action='store',nargs=1,dest='definitiva',help='Importar Montos definitivos'),
         
         )
     def __abrir_archivo(self,nombre):
@@ -38,10 +39,11 @@ class Command(BaseCommand):
                 Rubro(codigo=linea[1],rubro=linea[2],alicuota=alicuota,ut=linea[4]).save()
         self.stdout.write('Successfully closed poll' )
     
-    def __estimadas(self,archivo):
+    def __estimadas(self,archivo,estimadas=True):
         next(archivo)
         for linea in archivo:
             contrib=Contribuyente.objects.filter(id_contrato=linea[2])
+            print (linea)
             if not contrib.exists():
                 contrib=Contribuyente.objects.filter(num_identificacion=linea[3])
 
@@ -49,8 +51,18 @@ class Command(BaseCommand):
             if contrib.exists():
                 contrib=contrib[0]
                 rubro=Rubro.objects.filter(codigo=linea[7])[0]
-                if not Monto.objects.filter(contribuyente=contrib,ano=linea[0],rubro=rubro).exists():
-                    Monto(contribuyente=contrib,estimado=linea[8],ano=linea[0],rubro=rubro).save()
+                if estimadas:
+                    if not Monto.objects.filter(contribuyente=contrib,ano=linea[0],rubro=rubro).exists():
+                        Monto(contribuyente=contrib,estimado=linea[8],ano=linea[0],rubro=rubro).save()
+                else:
+                    definitiva=Monto.objects.filter(contribuyente=contrib,ano=linea[0],rubro=rubro)
+                    if definitiva.exists():
+                        definitiva=definitiva[0]
+                        definitiva.definitivo=linea[8]
+                        definitiva.save()
+                    else:
+                        Monto(contribuyente=contrib,definitivo=linea[8],estimado=0.0,ano=linea[0],rubro=rubro).save()
+
             else:
                 print ("Contribuyente no existe",linea)
 
@@ -234,6 +246,10 @@ class Command(BaseCommand):
             nombre=options['estimadas']
             archivo=self.__abrir_archivo(nombre)
             self.__estimadas(archivo)
+        elif options['definitiva'] is not None:
+            nombre=options['definitiva']
+            archivo=self.__abrir_archivo(nombre)
+            self.__estimadas(archivo,False)
             
 
 
