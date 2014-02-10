@@ -4,16 +4,15 @@ from django.http import HttpResponseRedirect
 from liquidaciones.models import Pago, Liquidacion, Impuesto
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.forms import ModelForm, TextInput, Textarea,Select,DateInput
 
 from django.forms.models import ModelChoiceField
 
-from contribuyentes.models import Rubro,Contribuyente
+from contribuyentes.models import Rubro, Contribuyente
 
 
 class ImpuestosForm(forms.Form):  # [0]
     contrib = forms.CharField(max_length=200, label="Contribuyente", required=True)
-    impuesto = forms.ModelChoiceField(queryset=Impuesto.objects.all().order_by('codigo'), required=True)
+    impuesto = forms.ModelChoiceField(queryset=Impuesto.objects.all().order_by('codigo'), required=True, empty_label=None)
 
     contrib.widget.attrs['class'] = 'ContribAjax col-md-12 form-control span12'
     contrib.widget.attrs['autocomplete'] = 'off'
@@ -24,8 +23,9 @@ class ImpuestosForm(forms.Form):  # [0]
     impuesto.widget.attrs['multiple'] = ''
     impuesto.widget.attrs['data-placeholder'] = 'Seleccione Impuestos'
     impuesto.widget.attrs['value'] = ''
+
     def clean_contrib(self):
-        data=self.cleaned_data['contrib']
+        data = self.cleaned_data['contrib']
         return Contribuyente.objects.get(num_identificacion=data.split(" ")[1])
 
 
@@ -66,7 +66,7 @@ class RubrosWidget(forms.widgets.Select):
         return mark_safe('\n'.join(output))
 
 class RubrosField(ModelChoiceField):
-    widget=RubrosWidget
+    widget = RubrosWidget
 
     def save_form_data(self, instance, data):
         pass
@@ -75,7 +75,7 @@ class RubrosField(ModelChoiceField):
         return  values
 class ContribuyenteForm(forms.ModelForm):
     rubro= forms.ModelMultipleChoiceField(queryset=Rubro.objects.all().order_by('codigo'),required=False,label='Rubros')
-    rubro.widget.attrs['class'] = 'chzn-select span4'
+    rubro.widget.attrs['class'] = 'chzn-select span8 col-md-12 form-control'
     rubro.widget.attrs['multiple'] = ''
     rubro.widget.attrs['data-placeholder'] = 'Seleccione Rubro'
     rubro.widget.attrs['value'] = ''
@@ -86,11 +86,11 @@ class ContribuyenteForm(forms.ModelForm):
         exclude=['id_contrato',]
         labels={'cedula_rep':'Cédula del Representante','representante':'Representante legal','direccion':'Dirección','num_identificacion':'Cédula/RIF'  }
 
-
 class RubrosForm(forms.Form):  # [1]
     #rubros = forms.ModelChoiceField(queryset=None, label="Rubros", required=True, empty_label=None)
     rubros = RubrosField(queryset=None, label="Rubros", required=True, empty_label=None)
     #rubros.widget = RubrosWidget()
+
     def clean_rubros(self):
         subtotales={}
         for (rubroid,monto) in self.cleaned_data.get('rubros').iteritems():
@@ -123,9 +123,7 @@ class TrimestresWidget(forms.widgets.Select):
                     impuestos[impuesto[1]]={}
                 impuestos[impuesto[1]].update({impuesto[0]:valor})
         return impuestos
-    """ Cómo se va a mostrar el widget
-    Retorna la lista de los estudiantes con el campo de nota
-    """
+
     def render(self, name, value, attrs=None, choices=()):
         from django.utils.safestring import mark_safe
         from itertools import chain
@@ -142,13 +140,14 @@ class TrimestresWidget(forms.widgets.Select):
                 for trim in range(4,0,-1):
                     output.append('<option value="%(trimestre)s">%(trimestre)s</option>'%({'trimestre':trim}))
 
-            
+
                 output.append('</select></div></td><td><div class="controls"><input name="descuento-%(impuesto)s" type="text"  style="width: 60px" value="0"/></div></td><td><div id="subtotal-%(impuesto)s">%(monto)s</div> BsF.</td><input type="hidden" name="cancelado-%(impuesto)s" value="%(monto)s" /> </tr>'%({'impuesto':impuesto['impuesto'].codigo,'monto':impuesto['montos']} ))
 
             output.append('<tbody>')
             output.append('</table>')
             output.append('</div>')
         return mark_safe('\n'.join(output))
+
 
 class TrimestresField(ModelChoiceField):
     widget=TrimestresWidget

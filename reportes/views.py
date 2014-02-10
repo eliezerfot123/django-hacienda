@@ -200,7 +200,7 @@ def liquidacion_report(request, liquidacion):
             ('BOX', (0, 9), (6, 0), 0.50, colors.black),
             ('GRID', (0, 0), (-1, -1), 0.50, colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONT', (0, 0), (-1, -1), "Helvetica", 5.5),
+            ('FONT', (0, 0), (-1, -1), "Helvetica", 6),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ]
         tabla = []

@@ -189,7 +189,7 @@
 
 										<li data-target="#step4">
 											<span class="step">4</span>
-											<span class="title">Imprimir Vauche/Liquidación</span>
+											<span class="title">Imprimir Liquidación</span>
 										</li>
 										{% elif wizard.steps.current == '1' %}
 										<li data-target="#step1">
@@ -209,7 +209,7 @@
 
 										<li data-target="#step4">
 											<span class="step">4</span>
-											<span class="title">Imprimir Vauche/Liquidación</span>
+											<span class="title">Imprimir Liquidación</span>
 										</li>
 										{% elif wizard.steps.current == '2' %}
 										<li data-target="#step1">
@@ -229,7 +229,7 @@
 
 										<li data-target="#step4">
 											<span class="step">4</span>
-											<span class="title">Imprimir Vauche/Liquidación</span>
+											<span class="title">Imprimir Liquidación</span>
 										</li>
 										{% else %}
 										<li data-target="#step1" class="active">
@@ -249,7 +249,7 @@
 
 										<li data-target="#step4" class="active">
 											<span class="step">4</span>
-											<span class="title">Imprimir Vauche/Liquidación</span>
+											<span class="title">Imprimir Liquidación</span>
 										</li>
 										{% endif %}
 									</ul>
@@ -275,8 +275,8 @@
 								            	{% endif %}
 								            </tr>
 								        </table>
-								        <p>Paso {{ wizard.steps.step1 }} de {{ wizard.steps.count }}</p>
-									<div class="modal-footer wizard-actions">
+
+								        <div class="modal-footer wizard-actions">
 									{% if wizard.steps.prev %}
 										<div class="row-fluid wizard-actions">
 											<button value="{{ wizard.steps.first }}" class="btn btn-success btn-next"/>
@@ -288,33 +288,15 @@
 										
 									{% endif %}
 										<button type="submit" class="btn btn-success btn-next" data-last="Finish ">
-											{% if wizard.steps.step1 < wizard.steps.count %} Siguiente {% else %} Generar {% endif %}
+											{% if wizard.steps.step1 < wizard.steps.count %} Siguiente 
 											<i class="icon-arrow-right icon-on-right"></i>
+											{% else %} Generar {% endif %}
+											
 										</button>
 										</div>
 									</div>
 								    </form>
 								{% endblock %}
-
-										{% if wizard.steps.current == '3' %} <!--Tercer formulario-->
-										<div class="control-group">
-											<label class="control-label" for="form-field-6">N° Deposito</label>
-
-											<div class="controls">
-												<input data-rel="tooltip" class="span3" type="text" id="form-field-6" placeholder="Deposito" title="" data-placement="bottom" />
-												<span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="Ingrese el número de deposito del banco." title="Deposito">?</span>
-											</div>
-										</div>
-
-										<hr />
-										<div class="control-group">
-											<div class="row-fluid">
-												<label class="control-label" for="form-field-select-3">Observaciones</label>&nbsp; &nbsp; &nbsp;
-
-												<textarea id="form-field-11" class="autosize-transition span4"></textarea>
-											</div>
-										</div>
-										{% endif %}
 									
 								</form>
 							</div>
