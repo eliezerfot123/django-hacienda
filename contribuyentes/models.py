@@ -9,7 +9,6 @@ class Rubro(models.Model):
     def __unicode__(self):
         return '%d %s (%d UT)'%(self.codigo,self.rubro,self.ut)
 
-
 class Contribuyente(models.Model):
     id_contrato=models.IntegerField(unique=True,null=True)
     num_identificacion=models.CharField(max_length=50)
@@ -40,6 +39,13 @@ class Contribuyente(models.Model):
     def liquidaciones(self,contrib):
         from liquidaciones.models import Pago
         return Pago.objects.filter(contribuyente=self)
+
+class Monto(models.Model):
+    contribuyente=models.ForeignKey(Contribuyente)
+    estimado=models.FloatField()
+    definitivo=models.FloatField(null=True)
+    ano=models.IntegerField()
+    rubro=models.ForeignKey(Rubro)
 
 class Licencia(models.Model):
     serial=models.CharField(max_length=20)
