@@ -4,5 +4,5 @@ from reportes.views import *
 urlpatterns = patterns('',
     url(r'^licencia_alcohol/$', 'reportes.views.licencia_expendio_alcohol'),
     url(r'^vauches/$', 'reportes.views.vauche_imprimir'),
-    url(r'^liquidacion/$', 'reportes.views.liquidacion_report'),
+    url(r'^liquidacion/(\w+)/$', 'reportes.views.liquidacion_report'),
 )
