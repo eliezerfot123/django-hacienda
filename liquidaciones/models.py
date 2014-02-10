@@ -65,8 +65,8 @@ class Pago2(models.Model):
     trimestres=models.IntegerField(default=4)
     intereses=models.FloatField(default=0.0)
     recargo=models.FloatField(default=0.0)
-    monto=models.FloatField()
-    cancelado=models.FloatField()
+    monto=models.FloatField() # Sub-Total
+    cancelado=models.FloatField() # ToTal
 
 
 

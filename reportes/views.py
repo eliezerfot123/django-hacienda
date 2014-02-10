@@ -14,7 +14,7 @@ from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib.units import cm
 from reportlab.lib import colors
 
-from liquidaciones.models import Liquidacion
+from liquidaciones.models import Liquidacion2, Pago2
 
 
 PAGE_HEIGHT = 29.7*cm
@@ -114,182 +114,218 @@ def vauche_imprimir(request):
 
 
 @login_required(login_url='/login/')
-def liquidacion_report(request):
+def liquidacion_report(request, liquidacion):
+    liquid = Liquidacion2.objects.get(numero=liquidacion)
+    pagos = Pago2.objects.filter(liquidacion=liquid.pk)
+
     nombre_reporte = "liquidacion"
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'attachment; filename='+nombre_reporte+'.pdf; pagesize=letter;'
 
-    fechas = datetime.datetime.today()
     #Esta lista contendra todos los elementos que se dibujaran en el pdf
     elementos = []
-    doc = SimpleDocTemplate(response, title=nombre_reporte, topMargin=20,
-                            bottomMargin=20, rightMargin=15, leftMargin=15)
+    doc = SimpleDocTemplate(response, title=nombre_reporte, topMargin=5,
+                            bottomMargin=5, rightMargin=15, leftMargin=15)
 
-    #---> Encabezado <---
-    styleSheet = getSampleStyleSheet()
-    cabecera = styleSheet['Normal']
-    cabecera.alignment = TA_CENTER
-    cabecera.firstLineIndent = 0
-    cabecera.fontSize = 10
-    cabecera.fontName = 'Helvetica-Bold'
-    cabecera.leftIndent = -200
-    cabecera.leading = 10
+    for i in range(0, 3):
+        #---> Encabezado <---
+        styleSheet = getSampleStyleSheet()
+        cabecera = styleSheet['Normal']
+        cabecera.alignment = TA_CENTER
+        cabecera.firstLineIndent = 0
+        cabecera.fontSize = 6
+        cabecera.fontName = 'Helvetica-Bold'
+        cabecera.leftIndent = -380
+        cabecera.leading = 7
 
-    logo = Image(settings.STATIC_ROOT+'/reportes/escudo.jpg',
-                 width=50, height=60)
-    logo.hAlign = 'LEFT'
-    elementos.append(logo)
+        logo = Image(settings.STATIC_ROOT+'/reportes/escudo.jpg',
+                    width=25, height=35)
+        logo.hAlign = 'LEFT'
+        elementos.append(logo)
 
-    elementos.append(Spacer(1, -50))
-    txtEncabezado = 'República Bolivariana de Venezuela'
-    txtEncabezado += '<br />Estado Cojedes'
-    txtEncabezado += '<br />Alcaldía del Municipio San Carlos'
-    txtEncabezado += '<br />Dirección de Rentas Municipales'
-    txtEncabezado += '<br />RIF: G-200003371-1'
-    encabezado = Paragraph(txtEncabezado, cabecera)
-    elementos.append(encabezado)
-    #---> Fin Encabezado <---
+        elementos.append(Spacer(1, -35))
+        txtEncabezado = 'República Bolivariana de Venezuela'
+        txtEncabezado += '<br />Estado Cojedes'
+        txtEncabezado += '<br />Alcaldía del Municipio San Carlos'
+        txtEncabezado += '<br />Dirección de Rentas Municipales'
+        txtEncabezado += '<br />RIF: G-200003371-1'
+        encabezado = Paragraph(txtEncabezado, cabecera)
+        elementos.append(encabezado)
+        #---> Fin Encabezado <---
 
-    # liquidaciones = Liquidacion.objects.get()
+        #---> Datos Contribuyente <---
+        styleSheet2 = getSampleStyleSheet()
+        estilo_contrib = styleSheet2['BodyText']
+        estilo_contrib.alignment = TA_CENTER
+        estilo_contrib.fontSize = 7
+        estilo_contrib.fontName = 'Times-Roman'
+        estilo_contrib.leading = 6
+        contrib_style = [
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ]
 
-    #---> Datos Contribuyente <---
-    styleSheet2 = getSampleStyleSheet()
-    estilo_contrib = styleSheet2['Normal']
-    estilo_contrib.alignment = TA_CENTER
-    estilo_contrib.fontSize = 10
-    estilo_contrib.fontName = 'Helvetica'
-    estilo_contrib.leftIndent = 300
-    estilo_contrib.leading = 15
-    estilo_contrib.borderWidth = 0.50
-    estilo_contrib.borderColor = colors.black
-    estilo_contrib.borderPadding = 2
+        elementos.append(Spacer(1, -37))
 
-    elementos.append(Spacer(1, -50))
-    txtContirb = 'INFORMACION GENERAL DEL CONTRIBUYENTE'
-    txtContirb += '<br />\t\tnombre '
-    txtContirb += '<br />CI/RIF:  Catastro/Placa:'
-    texto_contrib = Paragraph(txtContirb, estilo_contrib)
-    elementos.append(texto_contrib)
-    #---> Fin Datos Contrib <---
+        contrib1 = Paragraph('<b>INFORMACION GENERAL DEL CONTRIBUYENTE</b>', estilo_contrib)
+        contrib2 = Paragraph('%s' % liquid.contribuyente.nombre, estilo_contrib)
+        contrib3 = Paragraph('<b>CI/RIF:</b> %s ' % (liquid.contribuyente.num_identificacion), estilo_contrib)
 
-    #---> Tabla <---
-    elementos.append(Spacer(1, 20))
+        tabla_contrib = []
+        tabla_contrib.append([contrib1])
+        tabla_contrib.append([contrib2])
+        tabla_contrib.append([contrib3])
 
-    estilo_tabla = styleSheet['BodyText']
-    estilo_tabla.alignment = TA_CENTER
-    x = [
-        ('BACKGROUND', (0, 0), (6, 0), colors.silver),
-        ('BACKGROUND', (0, 2), (6, 2), colors.silver),
-        ('BACKGROUND', (0, 5), (6, 5), colors.silver),
-        ('BOX', (0, 5), (6, 0), 0.70, colors.black),
-        ('BOX', (0, 9), (6, 0), 0.70, colors.black),
-        ('TOPPADDING', (0, 0), (-1, -1), 2),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
-        ('GRID', (0, 0), (-1, -1), 0.80, colors.black),
-    ]
-    tabla = []
+        tabla_contrib = Table(tabla_contrib, colWidths=(12.0*cm))
+        tabla_contrib.setStyle(TableStyle(contrib_style))
+        tabla_contrib.hAlign = 'RIGHT'
 
-    # Headers de la tabla
-    hdatos = Paragraph('<b>Fecha Emisión</b>', estilo_tabla)
-    x.append(('SPAN', (0, 0), (1, 0))),  # Extendiendo columna
-    x.append(('SPAN', (0, 1), (1, 1))),  # Extendiendo columna
+        elementos.append(tabla_contrib)
+        #---> Fin Datos Contrib <---
 
-    hdatos1 = Paragraph('<b>Fecha Vencimiento</b>', estilo_tabla)
-    hdatos2 = Paragraph('<b>ID</b>', estilo_tabla)
-    hdatos3 = Paragraph('<b>No. Liquidación</b>', estilo_tabla)
+        #---> Tabla <---
+        elementos.append(Spacer(1, 10))
 
-    hdatos4 = Paragraph('<b>No. Deposito</b>', estilo_tabla)
-    x.append(('SPAN', (5, 0), (6, 0))),  # Extendiendo columna
-    x.append(('SPAN', (5, 1), (6, 1))),  # Extendiendo columna
+        estilo_tabla = styleSheet['BodyText']
+        estilo_tabla.alignment = TA_CENTER
+        estilo_tabla.fontSize = 6
+        estilo_tabla.leading = 7
+        x = [
+            ('BACKGROUND', (0, 0), (6, 0), colors.silver),
+            ('BACKGROUND', (0, 2), (6, 2), colors.silver),
+            ('BACKGROUND', (0, -2), (-1, -2), colors.silver),
+            ('SPAN', (0, -2), (-6, -2)),
+            ('SPAN', (0, -1), (-6, -1)),
+            ('BOX', (0, 5), (6, 0), 0.50, colors.black),
+            ('BOX', (0, 9), (6, 0), 0.50, colors.black),
+            ('GRID', (0, 0), (-1, -1), 0.50, colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONT', (0, 0), (-1, -1), "Helvetica", 5.5),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]
+        tabla = []
 
-    hPagos = Paragraph('<b>DETALLE DE PAGO DE IMPUESTOS VARIOS</b>', estilo_tabla)
-    x.append(('SPAN', (0, 2), (6, 2))),  # Extendiendo columna
+        # Headers de la tabla
+        hdatos = Paragraph('<b>Fecha Emisión</b>', estilo_tabla)
+        x.append(('SPAN', (0, 0), (1, 0))),  # Extendiendo columna
+        x.append(('SPAN', (0, 1), (1, 1))),  # Extendiendo columna
 
-    hpago= Paragraph('<b>Año</b>', estilo_tabla)
-    hpago1 = Paragraph('<b>Codigo</b>', estilo_tabla)
-    hpago2 = Paragraph('<b>Impuesto</b>', estilo_tabla)
-    hpago3 = Paragraph('<b>Monto Impuesto o Tasa</b>', estilo_tabla)
-    hpago4 = Paragraph('<b>Recargo</b>', estilo_tabla)
-    hpago5 = Paragraph('<b>Intereses</b>', estilo_tabla)
-    hpago6 = Paragraph('<b>Sub-Total</b>', estilo_tabla)
+        hdatos1 = Paragraph('<b>Fecha Vencimiento</b>', estilo_tabla)
+        hdatos2 = Paragraph('<b>ID</b>', estilo_tabla)
+        hdatos3 = Paragraph('<b>No. Liquidación</b>', estilo_tabla)
 
-    hpago7 = Paragraph('<b>Credito Fiscal</b>', estilo_tabla)
-    hpago8 = Paragraph('<b>Descuento</b>', estilo_tabla)
-    hpago9 = Paragraph('<b>Total a Pagar(Bs.)</b>', estilo_tabla)
-    hpago10 = Paragraph('<b>Impuesto o Tasa</b>', estilo_tabla)
-    # Fin Headers de la tabla
+        hdatos4 = Paragraph('<b>No. Deposito</b>', estilo_tabla)
+        x.append(('SPAN', (5, 0), (6, 0))),  # Extendiendo columna
+        x.append(('SPAN', (5, 1), (6, 1))),  # Extendiendo columna
 
-    tabla.append([hdatos, '', hdatos1, hdatos2, hdatos3, hdatos4, ''])
-    tabla.append(['', '', '', '', '', '', ''])
+        hPagos = Paragraph('<b>DETALLE DE PAGO DE IMPUESTOS VARIOS</b>', estilo_tabla)
+        x.append(('SPAN', (0, 2), (6, 2))),  # Extendiendo columna
 
-    tabla.append([hPagos])
-    tabla.append([hpago, hpago1, hpago2, hpago3, hpago4, hpago5, hpago6])
-    tabla.append(['', '', '', '', '', '', ''])
+        hpago= Paragraph('<b>Año</b>', estilo_tabla)
+        hpago1 = Paragraph('<b>Codigo</b>', estilo_tabla)
+        hpago2 = Paragraph('<b>Impuesto</b>', estilo_tabla)
+        hpago3 = Paragraph('<b>Monto Impuesto o Tasa</b>', estilo_tabla)
+        hpago4 = Paragraph('<b>Recargo</b>', estilo_tabla)
+        hpago5 = Paragraph('<b>Intereses</b>', estilo_tabla)
+        hpago6 = Paragraph('<b>Sub-Total</b>', estilo_tabla)
 
-    #  for liq in liquidaciones:
+        hpago7 = Paragraph('<b>Credito Fiscal</b>', estilo_tabla)
+        hpago8 = Paragraph('<b>Descuento</b>', estilo_tabla)
+        hpago9 = Paragraph('<b>Total(Bs.)</b>', estilo_tabla)
+        hpago10 = Paragraph('<b>Impuesto o Tasa</b>', estilo_tabla)
+        # Fin Headers de la tabla
 
-    tabla.append([hpago7, '', hpago8, hpago10, hpago4, hpago5, hpago9])
-    tabla.append(['', '', '', '', '', '', ''])
+        tabla.append([hdatos, '', hdatos1, hdatos2, hdatos3, hdatos4, ''])
+        tabla.append([liquid.emision, '', liquid.vencimiento, liquid.pk, liquid.numero, liquid.deposito, ''])
+        pos = 0
+        recargo = 0
+        intereses = 0
+        cancelado = 0
+        monto = 0
+        for pago in pagos:
 
-    t = Table(tabla, colWidths=(2.0*cm, 2.0*cm, 3.5*cm, 3.5*cm, 3.5*cm, 2.0*cm, 2.2*cm))
-    t.setStyle(TableStyle(x))
-    elementos.append(t)
-    #---> Fin Tabla <---
+            if pos == 0:
+                tabla.append([hPagos])
+                tabla.append([hpago, hpago1, hpago2, hpago3, hpago4, hpago5, hpago6])
+            tabla.append([liquid.ano, pago.impuesto.codigo, pago.impuesto.descripcion, pago.monto, pago.recargo, pago.intereses, pago.cancelado])
 
-    #---> Notas <---
-    styleSheetNota = getSampleStyleSheet()
-    nota = styleSheetNota['Normal']
-    nota.fontsize = 12
-    nota.fontName = 'Helvetica'
-    nota.alignment = TA_LEFT
-    nota.spaceBefore = 15
+            pos = pos + 1
 
-    txtNota1 = Paragraph('<b>DETALLES</b> <br /> <b>DERECHO REGISTRAR</b>', nota)
-    elementos.append(txtNota1)
+            recargo = recargo + pago.recargo
+            intereses = intereses + pago.intereses
+            cancelado = cancelado + pago.cancelado
+            monto = monto + pago.monto
 
-    elementos.append(Spacer(1, 10))
-    styleSheet3 = getSampleStyleSheet()
-    parrafo = styleSheet3['Normal']
-    parrafo.fontsize = 12
-    parrafo.rightIndent = -320
-    parrafo.fontName = 'Helvetica'
-    parrafo.alignment = TA_CENTER
-    parrafo.spaceBefore = 15
+        tabla.append([hpago7, '', hpago8, hpago10, hpago4, hpago5, hpago9])
+        tabla.append(['0', '', pago.descuento, cancelado, recargo, intereses, monto])
 
-    txtNota1 = Paragraph('Evite Sanciones...Cumpla con su Ciudad...!', parrafo)
-    elementos.append(txtNota1)
+        t = Table(tabla, colWidths=(2.0*cm, 2.0*cm, 3.5*cm, 3.5*cm, 3.5*cm, 2.0*cm, 2.2*cm))
+        t.setStyle(TableStyle(x))
+        elementos.append(t)
+        #---> Fin Tabla <---
 
-    txtNota2 = Paragraph('Para más información dirijase a las oficinas de <br /> Rentas Municipales.', parrafo)
-    elementos.append(txtNota2)
+        #---> Notas <---
+        styleSheetNota = getSampleStyleSheet()
+        nota = styleSheetNota['Normal']
+        nota.fontSize = 6
+        nota.fontName = 'Helvetica'
+        nota.alignment = TA_LEFT
 
-    txtNota3 = Paragraph('Atención: ING. Glendys Quiñones'+
-                         '<br /><b>Directora</b>'+
-                         '<br />CONTRIBUYENTE', parrafo)
-    elementos.append(txtNota3)
-    #---> Fin Notas <---
+        txtNota1 = Paragraph('<b>DETALLES:</b> <br /> <b>%s</b>' % liquid.observaciones, nota)
+        elementos.append(txtNota1)
 
-    #---> Firmas <---
-    elementos.append(Spacer(1, -70))
-    estilo_tabla2 = styleSheet['BodyText']
-    estilo_tabla2.alignment = TA_CENTER
-    estilo_tabla2.fontsize = 8
-    y = [
-        ('BOX', (0, 0), (-1, -1), 0.50, colors.black),
-        ('VALIGN',(0,0),(0,1),'TOP'),
-    ]
-    hrecibi = Paragraph('VALIDACIÓN', estilo_tabla2)
-    hsellos = Paragraph('SELLOS', estilo_tabla2)
-    hautorizada = Paragraph('FIRMA FUNCIONARIO', estilo_tabla2)
+        elementos.append(Spacer(1, 10))
+        styleSheet3 = getSampleStyleSheet()
+        parrafo = styleSheet3['Normal']
+        parrafo.fontSize = 6
+        parrafo.rightIndent = -320
+        parrafo.fontName = 'Helvetica'
+        parrafo.alignment = TA_CENTER
 
-    tabla2 = []
-    tabla2.append([hrecibi, '\n', '\n'])
-    tabla2.append(['\n\n', hsellos, hautorizada])
+        elementos.append(Spacer(1, -17))
+        txtNota1 = Paragraph('Evite Sanciones...Cumpla con su Ciudad...!', parrafo)
+        elementos.append(txtNota1)
 
-    t2 = Table(tabla2, colWidths=(3.0*cm, 2.0*cm, 6.0*cm))
-    t2.setStyle(TableStyle(y))
-    t2.hAlign = 'LEFT'
-    elementos.append(t2)
-    #---> Fin Firmas <---
+        txtNota2 = Paragraph('Para más información dirijase a las oficinas de Rentas Municipales.'+
+                             '<br />Atención: ING. Glendys Quiñones' +
+                             '<br /><b>Directora</b>', parrafo)
+        elementos.append(txtNota2)
+        #---> Fin Notas <---
+
+        #---> Firmas <---
+        elementos.append(Spacer(1, -42))
+        estilo_tabla2 = styleSheet['BodyText']
+        estilo_tabla2.alignment = TA_CENTER
+        estilo_tabla2.fontSize = 5
+        y = [
+            ('BOX', (0, 0), (-1, -1), 0.50, colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ]
+        hrecibi = Paragraph('VALIDACIÓN', estilo_tabla2)
+        hsellos = Paragraph('SELLOS', estilo_tabla2)
+        hautorizada = Paragraph('FIRMA FUNCIONARIO', estilo_tabla2)
+
+        tabla2 = []
+        tabla2.append([hrecibi, '', ''])
+        tabla2.append(['', hsellos, hautorizada])
+
+        t2 = Table(tabla2, colWidths=(3.0*cm, 3.0*cm, 4.0*cm))
+        t2.setStyle(TableStyle(y))
+        t2.hAlign = 'LEFT'
+        elementos.append(t2)
+        #---> Fin Firmas <---
+
+        elementos.append(Spacer(1, 5))
+        lineaStyle = [
+            ('LINEABOVE', (0, 0), (-1, -1), 0.35, colors.black),
+            ('FONT', (0, 0), (-1, -1), "Helvetica", 2),
+        ]
+        linea = []
+        linea.append([' '])
+
+        l2 = Table(linea, colWidths=(20.0*cm))
+        l2.setStyle(TableStyle(lineaStyle))
+        elementos.append(l2)
 
     doc.build(elementos)
     return response
