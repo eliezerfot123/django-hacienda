@@ -79,6 +79,8 @@ class ContribuyenteForm(forms.ModelForm):
     rubro.widget.attrs['multiple'] = ''
     rubro.widget.attrs['data-placeholder'] = 'Seleccione Rubro'
     rubro.widget.attrs['value'] = ''
+    direccion=forms.CharField(widget=forms.Textarea)
+    direccion.widget.attrs={'class':'autosizejs autosize-transition span4','style':'overflow: hidden; word-wrap: break-word; resize: vertical;'}
     class Meta:
         model=Contribuyente
         exclude=['id_contrato',]
