@@ -42,12 +42,14 @@ class Command(BaseCommand):
         next(archivo)
         for linea in archivo:
             contrib=Contribuyente.objects.filter(id_contrato=linea[2])
+            if not contrib.exists():
+                contrib=Contribuyente.objects.filter(num_identificacion=linea[3])
+
 
             if contrib.exists():
                 contrib=contrib[0]
                 rubro=Rubro.objects.filter(codigo=linea[7])[0]
                 if not Monto.objects.filter(contribuyente=contrib,ano=linea[0],rubro=rubro).exists():
-                    print (linea)
                     Monto(contribuyente=contrib,estimado=linea[8],ano=linea[0],rubro=rubro).save()
             else:
                 print ("Contribuyente no existe",linea)
@@ -60,7 +62,7 @@ class Command(BaseCommand):
         next(archivo)
         for linea in archivo:
             print (linea)
-            if not Contribuyente.objects.filter(num_identificacion=linea[2]).exists():
+            if not Contribuyente.objects.filter(id_contrato=linea[1]).exists():
                 print ("NO EXISTE")
                 contribuyente=Contribuyente(id_contrato=linea[1],num_identificacion=linea[2],nombre=linea[3],telf=linea[4],fax=linea[5],representante=linea[6],cedula_rep=linea[7],capital=linea[8],direccion=linea[12],modificado=linea[14])
                 contribuyente.save()
@@ -79,29 +81,6 @@ class Command(BaseCommand):
             else:
                 print ("EXISTE")
 
-    def __contribuyentelic(self,archivo):
-        #for n in range(24000):
-        next(archivo)
-        for linea in archivo:
-            print (linea)
-            if not Contribuyente.objects.filter(num_identificacion=linea[2]).exists():
-                print ("NO EXISTE")
-                contribuyente=Contribuyente(id_contrato=linea[1],num_identificacion=linea[2],nombre=linea[3],telf=linea[4],fax=linea[5],representante=linea[6],cedula_rep=linea[7],capital=linea[8],direccion=linea[12],modificado=linea[14])
-                contribuyente.save()
-                sep='-'
-                if linea[13] !='' and 'DESINCOR' not in linea[13] and 'desincor' not in linea[13] and 'INACTIV' not in linea[13] and 'INHABILITAD' not in linea[13] and 'AGENTE' not in linea[13]:
-                    if len(linea[13].split(','))>1:
-                        sep=','
-
-                    for rubros in linea[13].split(sep):
-                        rubro=Rubro.objects.filter(codigo=rubros)
-                        if rubro.exists():
-                            rubro=rubro[0]
-                            contribuyente.rubro.add(rubro)
-                        else:
-                            print ("RUBRO NO EXISTE!",rubros)
-            else:
-                print ("EXISTE")
 
     def __liquidacion(self,archivo):
         next(archivo)
@@ -193,8 +172,7 @@ class Command(BaseCommand):
         #for n in range(24000):
         next(archivo)
         for linea in archivo:
-
-            if not Contribuyente.objects.filter(num_identificacion=linea[1]).exists():
+            if not Contribuyente.objects.filter(id_contrato=linea[0]).exists():
                 print ("Contribuyente no existe",linea)
                 if linea[7]=='':
                     linea[7]=0.0
