@@ -21,17 +21,20 @@ class Contribuyente(models.Model):
     capital=models.FloatField(default=0.0)
     direccion=models.CharField(null=True,blank=True,max_length=300)
     rubro=models.ManyToManyField(Rubro,null=True,blank=True)
-    modificado=models.DateField(auto_now_add=True)
+    modificado=models.DateField(auto_now_add=True, auto_now=True)
 
     def __unicode__(self):
         return '%d %s %s %s'%(self.id_contrato,self.num_identificacion,self.nombre,self.representante)
-    
+
     def save(self):
         if not self.id_contrato:
             from django.db.models import Max
             self.id_contrato=Contribuyente.objects.all().aggregate(Max('id_contrato'))['id_contrato__max']+1
-        return super(Contribuyente,self).save(self)
-            
+            return super(Contribuyente,self).save(self)
+        else:
+            return super(Contribuyente,self).save(update_fields=['num_identificacion', 'nombre', 'telf',
+                                                                 'fax', 'email', 'representante',
+                                                                 'cedula_rep', 'capital', 'direccion', 'modificado'])
 
     def licencias(self,):
         return Licencia.object.filter(contribuyente=self.pk)

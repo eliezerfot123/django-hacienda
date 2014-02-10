@@ -10,8 +10,8 @@ from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 import json
 from django.contrib.formtools.wizard.views import SessionWizardView
-from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm,ContribuyenteForm
-from django.views.generic.edit import CreateView
+from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm,ContribuyenteForm, EditarContribuyenteForm
+from django.views.generic.edit import CreateView, UpdateView
 from contribuyentes.models import Contribuyente
 
 class ContribuyenteCrear(CreateView):
@@ -22,9 +22,21 @@ class ContribuyenteCrear(CreateView):
     def form_valid(self,form):
         from django.contrib import messages
         messages.success(self.request, "Contribuyente registrado")
-        
+
         return super(ContribuyenteCrear,self).form_valid(form)
-        
+
+
+class ContribuyenteEditar(UpdateView):
+    model = Contribuyente
+    template_name = 'contribuyente_editar.html'
+    form_class = EditarContribuyenteForm
+    success_url = '.'
+
+    def form_valid(self,form):
+        from django.contrib import messages
+        messages.success(self.request, "Contribuyente Actualizado")
+
+        return super(ContribuyenteEditar, self).form_valid(form)
 
 
 class LiquidacionWizard(SessionWizardView):

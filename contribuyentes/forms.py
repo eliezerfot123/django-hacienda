@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from liquidaciones.models import Pago, Liquidacion, Impuesto
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.forms import ModelForm, TextInput, Textarea,Select,DateInput
 
 from django.forms.models import ModelChoiceField
 
@@ -163,3 +164,21 @@ class LiquidacionForm(forms.Form):  # [2]
     trimestre = TrimestresField(queryset=None,required=True,label="")
     numero = forms.CharField(label="Nro. Deposito/Cheque")
     observaciones = forms.CharField(widget=forms.Textarea)
+
+
+class EditarContribuyenteForm(forms.ModelForm):
+    rubro = forms.ModelMultipleChoiceField(queryset=Rubro.objects.all().order_by('codigo'), required=False, label='Rubros')
+    rubro.widget.attrs['class'] = 'chzn-select span6 col-md-12 form-control'
+    rubro.widget.attrs['multiple'] = ''
+    rubro.widget.attrs['data-placeholder'] = 'Seleccione Rubros...'
+    rubro.widget.attrs['value'] = ''
+
+    class Meta:
+        model = Contribuyente
+        exclude = ['id_contrato',]
+        labels = {'cedula_rep':'Cédula del Representante','representante':'Representante legal','direccion':'Dirección','num_identificacion':'Cédula/RIF'}
+        widgets = {
+            'representante': TextInput(attrs={'autofocus':'autofocus', 'class': 'span6'}),
+            'nombre': TextInput(attrs={'autofocus':'autofocus', 'class': 'span6'}),
+            'direccion': Textarea(attrs={'autofocus':'autofocus', 'class': 'autosize-transition span8 limited', 'maxlength': '200', 'data-maxlength': '200', 'style': 'height:60px;'}),
+        }
