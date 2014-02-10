@@ -15,6 +15,7 @@ class Command(BaseCommand):
         make_option('--liquidacion',action='store',nargs=1,dest='liquidacion',help='Importar liquidaciones'),
         make_option('--licencia',action='store',nargs=1,dest='licencia',help='Importar licencia'),
         make_option('--pago',action='store',nargs=1,dest='pagos',help='Importar pagos'),
+        make_option('--estimadas',action='store',nargs=1,dest='estimadas',help='Importar Montos estimados'),
         
         )
     def __abrir_archivo(self,nombre):
@@ -36,6 +37,47 @@ class Command(BaseCommand):
                     alicuota=0
                 Rubro(codigo=linea[1],rubro=linea[2],alicuota=alicuota,ut=linea[4]).save()
         self.stdout.write('Successfully closed poll' )
+    
+    def __estimadas(self,archivo):
+        next(archivo)
+        for linea in archivo:
+            contrib=Contribuyente.objects.filter(id_contrato=linea[2])
+
+            if contrib.exists():
+                contrib=contrib[0]
+                rubro=Rubro.objects.filter(codigo=linea[7])[0]
+                if not Monto.objects.filter(contribuyente=contrib,ano=linea[0],rubro=rubro).exists():
+                    print (linea)
+                    Monto(contribuyente=contrib,estimado=linea[8],ano=linea[0],rubro=rubro).save()
+            else:
+                print ("Contribuyente no existe",linea)
+
+
+        self.stdout.write('Successfully closed poll' )
+
+    def __contribuyentelic(self,archivo):
+        #for n in range(24000):
+        next(archivo)
+        for linea in archivo:
+            print (linea)
+            if not Contribuyente.objects.filter(num_identificacion=linea[2]).exists():
+                print ("NO EXISTE")
+                contribuyente=Contribuyente(id_contrato=linea[1],num_identificacion=linea[2],nombre=linea[3],telf=linea[4],fax=linea[5],representante=linea[6],cedula_rep=linea[7],capital=linea[8],direccion=linea[12],modificado=linea[14])
+                contribuyente.save()
+                sep='-'
+                if linea[13] !='' and 'DESINCOR' not in linea[13] and 'desincor' not in linea[13] and 'INACTIV' not in linea[13] and 'INHABILITAD' not in linea[13] and 'AGENTE' not in linea[13]:
+                    if len(linea[13].split(','))>1:
+                        sep=','
+
+                    for rubros in linea[13].split(sep):
+                        rubro=Rubro.objects.filter(codigo=rubros)
+                        if rubro.exists():
+                            rubro=rubro[0]
+                            contribuyente.rubro.add(rubro)
+                        else:
+                            print ("RUBRO NO EXISTE!",rubros)
+            else:
+                print ("EXISTE")
 
     def __contribuyentelic(self,archivo):
         #for n in range(24000):
@@ -96,16 +138,17 @@ class Command(BaseCommand):
                 contrib=contrib[0]
                 if liquid.exists():
                     pago=Pago.objects.filter(liquidacion=liquid)
+                    print ("Si existe")
                 else:
                     pago=Pago.objects.filter(num_liquidacion=linea[0])
                 if not pago.exists():
-                    print (linea)
 
                     linea[3]=self.__fechas(linea[3])
                     linea[4]=self.__fechas(linea[4])
                     linea[13]=self.__fechas(linea[13])
                     pago=Pago(contribuyente=contrib,deposito=linea[2],emision=linea[3],vencimiento=linea[4],credito_fiscal=linea[5],descuento=linea[6],impuesto=linea[7],recargo=linea[8],intereses=linea[9],fecha_pago=linea[13],observaciones=linea[18])
                     if liquid.exists():
+                        print (liquid)
                         liquid=liquid[0]
                         pago.liquidacion=liquid
                     else:
@@ -150,9 +193,9 @@ class Command(BaseCommand):
         #for n in range(24000):
         next(archivo)
         for linea in archivo:
-            print (linea)
 
             if not Contribuyente.objects.filter(num_identificacion=linea[1]).exists():
+                print ("Contribuyente no existe",linea)
                 if linea[7]=='':
                     linea[7]=0.0
                 else:
@@ -181,8 +224,6 @@ class Command(BaseCommand):
 
 
             
-            else:
-                print ("Contribuyente ya existe",linea[1])
 
 
     def handle(self, *args, **options):
@@ -211,6 +252,10 @@ class Command(BaseCommand):
             nombre=options['pagos']
             archivo=self.__abrir_archivo(nombre)
             self.__pagos(archivo)
+        elif options['estimadas']is not None: 
+            nombre=options['estimadas']
+            archivo=self.__abrir_archivo(nombre)
+            self.__estimadas(archivo)
             
 
 
