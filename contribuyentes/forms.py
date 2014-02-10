@@ -75,7 +75,7 @@ class RubrosField(ModelChoiceField):
         return  values
 class ContribuyenteForm(forms.ModelForm):
     rubro= forms.ModelMultipleChoiceField(queryset=Rubro.objects.all().order_by('codigo'),required=False,label='Rubros')
-    rubro.widget.attrs['class'] = 'chzn-select span4'
+    rubro.widget.attrs['class'] = 'chzn-select span8 col-md-12 form-control'
     rubro.widget.attrs['multiple'] = ''
     rubro.widget.attrs['data-placeholder'] = 'Seleccione Rubro'
     rubro.widget.attrs['value'] = ''
