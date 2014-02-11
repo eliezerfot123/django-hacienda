@@ -109,9 +109,20 @@ class LiquidacionWizard(SessionWizardView):
         import datetime
         liquidacion=Liquidacion2(ano=datetime.date.today().year,deposito=form_list[2].cleaned_data['numero'],emision=datetime.date.today(),contribuyente=form_list[0].cleaned_data['contrib'],vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),observaciones=form_list[2].cleaned_data['observaciones'],liquidador=self.request.user)
         liquidacion.save()
-        for impuesto,pagos in form_list[2].cleaned_data['trimestre'].iteritems():
+        for ano,rubros in self.get_all_cleaned_data()['rubros'].iteritems():
+            monto=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano,definitivo=None)
+            for montos in rubros:
+                definitiva=monto.filter(rubro__codigo=montos)
+                if definitiva.exists():
+                    definitiva=definitiva[0]
+                    definitiva.definitivo=rubros[montos]
+                    definitiva.save()
 
-            pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'])
+
+        for impuesto,pagos in form_list[2].cleaned_data['trimestre'].iteritems():
+            ut=UT.objects.filter(ano=datetime.date.today().year-1)[0]
+
+            pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'],ut=ut)
             pago.save()
 
         return HttpResponseRedirect("/reporte/liquidacion/%s/" % liquidacion.numero)
