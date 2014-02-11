@@ -69,7 +69,8 @@ class LiquidacionWizard(SessionWizardView):
             self.query = Monto.objects.filter(contribuyente=form.cleaned_data['contrib'])
 
         elif self.steps.current == '1':
-            subtotal=0.0
+            subtotaldef=0.0
+            subtotalest=0.0
             if form.is_valid():
                 for ano,rubros in form.cleaned_data['rubros'].iteritems():
                     ano=int(ano)
@@ -84,20 +85,37 @@ class LiquidacionWizard(SessionWizardView):
                             for montos in rubros:
                                 rubro=Rubro.objects.get(codigo=montos)
                                 montout=float(rubro.ut)*ut
-                                montoali=float(rubros[montos])*rubro.alicuota
+                                montoali=float(rubros[montos])*(rubro.alicuota/100)
                                 if montout>montoali:
-                                    subtotal+=montout
+                                    subtotaldef+=montout
                                 else:
-                                    subtotal+=montoali
+                                    subtotaldef+=montoali
                                 estimada=definitivas.filter(rubro=rubro).exclude(estimado=None)
                                 if estimada.exists():
-                                    montoali=float(estimada[0].estimado)*rubro.alicuota
+                                    montoali=float(estimada[0].estimado)*(rubro.alicuota/100)
                                     if montout>montoali:
-                                        subtotal-=montout
+                                        subtotaldef-=montout
                                     else:
-                                        subtotal-=montoali
+                                        subtotaldef-=montoali
+                    elif ano==datetime.datetime.today().year:
+                        estimadas=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano).exclude(estimado=None)
+                        if estimadas.exists():
+                            ut=UT.objects.filter(ano=ano)
+                            if ut.exists():
+                                ut=ut[0].valor
+                            else:
+                                ut=UT.objects.get(ano=ano-1).valor
+                            for montos in rubros:
+                                rubro=Rubro.objects.get(codigo=montos)
+                                montout=float(rubro.ut)*ut
+                                montoali=float(rubros[montos])*(rubro.alicuota/100)
+                                if montout>montoali:
+                                    subtotalest+=montout
+                                else:
+                                    subtotalest+=montoali
 
-                self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':subtotal})
+
+                self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':{'2013':subtotaldef,'2014':subtotalest}})
             else:
                 formu.fields['rubros'].queryset = self.query
 
