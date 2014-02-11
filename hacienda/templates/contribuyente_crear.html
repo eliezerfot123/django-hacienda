@@ -166,7 +166,7 @@
 				<div class="page-content">
 					<div class="page-header position-relative">
 						<h1>
-						    Contribuyentes
+						    <a href="/sdr/">Contribuyentes</a> <!--Botón para regresar-->
 							<small>
 								<i class="icon-double-angle-right"></i>
                                 Registrar
@@ -174,41 +174,51 @@
 							</small>
 						</h1>
 					</div><!--/.page-header-->
-{% if messages%}
-    {% for message in messages %}
-    <div class="alert alert-block alert-success">
 
-        <button class="close" data-dismiss="alert" type="button">
-            <i class="icon-remove"></i>
-        </button>
-        <p>
-            <strong>
-                <i class="icon-ok"></i>
-{{message}}
-            </strong>
-       El contribuyente fue registrado con éxito 
-        </p>
+					{% if messages%}
+					    {% for message in messages %}
+					    <div class="alert alert-block alert-success">
 
-    </div>
-    {%endfor %}
-{% endif %}
+					        <button class="close" data-dismiss="alert" type="button">
+					            <i class="icon-remove"></i>
+					        </button>
+					        <p>
+					            <strong>
+					                <i class="icon-ok"></i>
+					{{message}}
+					            </strong>
+					       El contribuyente fue registrado con éxito 
+					        </p>
 
+					    </div>
+					    {%endfor %}
+					{% endif %}
+
+						<div class="row-fluid">
+							<div class="span12">
 								{% block formulario %}
 
-								    <form action="." method="post" >{% csrf_token %} 
+								<form action="." method="post" class="form-horizontal">{% csrf_token %} 
 								    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+										<div class="control-group">
 
-								        <div class="span6">
 								            <div class="controls">
-								            		{{form}}
+									            <table>
+									            	<tr>
+									            		{{form}}
+									            	</tr>
+									            </table>
                                             </div>
                                             <div class="form-actions">
                                                 <button class="btn" type="reset">Limpiar</button>
 
                                                 <button class="btn btn-info" type="submit">Registrar</button>
                                             </div>
+                                        </div>
                                 </form>
                                 {% endblock %}
+                            </div>
+                        </div>
 					</div><!--/.row-fluid-->
 				</div><!--/.page-content-->
 			</div><!--/.main-content-->
