@@ -166,7 +166,7 @@
 				<div class="page-content">
 					<div class="page-header position-relative">
 						<h1>
-						    Contribuyentes
+						    <a href=javascript:history.back(1)>Contribuyentes</a> <!--Botón para regresar-->
 							<small>
 								<i class="icon-double-angle-right"></i>
                                 Editar
@@ -197,16 +197,16 @@
 							<div class="span12">
 								{% block formulario %}
 
-								    <form action="." method="post" class="form-horizontal">{% csrf_token %} 
+								<form action="." method="post" class="form-horizontal">{% csrf_token %} 
 								    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
 								    	<div class="control-group">
 
 								            <div class="controls">
-								            <table>
-								            	<tr>
-								            		{{form}}
-								            	</tr>
-								            </table>
+									            <table>
+									            	<tr>
+									            		{{form}}
+									            	</tr>
+									            </table>
                                             </div>
                                             <div class="form-actions">
                                                 <button class="btn" type="reset">Limpiar</button>
@@ -218,7 +218,6 @@
                                 {% endblock %}
                             </div>
                         </div>
-					</div><!--/.row-fluid-->
 				</div><!--/.page-content-->
 			</div><!--/.main-content-->
 		</div><!--/.main-container-->
