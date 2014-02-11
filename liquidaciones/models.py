@@ -2,6 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 from contribuyentes.models import Contribuyente
 
+class UT(models.Model):
+    ano=models.IntegerField()
+    valor=models.FloatField()
+    def __unicode__(self):
+        return '%d %d'%(self.ano,self.valor)
+
 
 class Impuesto(models.Model):
     codigo=models.IntegerField()
@@ -60,7 +66,7 @@ class Liquidacion2(models.Model):
 class Pago2(models.Model):
     liquidacion=models.ForeignKey(Liquidacion2)
     impuesto=models.ForeignKey(Impuesto)
-    ut=models.FloatField(default=107)
+    ut=models.ForeignKey(UT)
     descuento=models.FloatField(default=0.0)
     trimestres=models.IntegerField(default=4)
     intereses=models.FloatField(default=0.0)
