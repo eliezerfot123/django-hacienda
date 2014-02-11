@@ -5,7 +5,7 @@ from django.template.context import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from liquidaciones.models import Pago, Liquidacion,Impuesto,Liquidacion2,Pago2
+from liquidaciones.models import Pago, Liquidacion,Impuesto,Liquidacion2,Pago2,UT
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 import json
@@ -62,16 +62,44 @@ class LiquidacionWizard(SessionWizardView):
         return formu
 
     def process_step(self, form):
+        import datetime
 
         if self.steps.current == '0':
             self.impuesto = form.cleaned_data['impuesto']
-            self.query = Rubro.objects.filter(contribuyente=form.cleaned_data['contrib'])
+            self.query = Monto.objects.filter(contribuyente=form.cleaned_data['contrib'])
 
         elif self.steps.current == '1':
             subtotal=0.0
-            for rubroid,subtotales in form.cleaned_data['rubros'].iteritems():
-                subtotal+=float(subtotales)
-            self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':subtotal})
+            if form.is_valid():
+                for ano,rubros in form.cleaned_data['rubros'].iteritems():
+                    ano=int(ano)
+                    if ano ==datetime.datetime.today().year-1:
+                        ut=UT.objects.filter(ano=ano)
+                        if ut.exists():
+                            ut=ut[0].valor
+                        else:
+                            ut=UT.objects.get(ano=ano-1).valor
+                        definitivas=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano)
+                        if definitivas.exists():
+                            for montos in rubros:
+                                rubro=Rubro.objects.get(codigo=montos)
+                                montout=float(rubro.ut)*ut
+                                montoali=float(rubros[montos])*rubro.alicuota
+                                if montout>montoali:
+                                    subtotal+=montout
+                                else:
+                                    subtotal+=montoali
+                                estimada=definitivas.filter(rubro=rubro).exclude(estimado=None)
+                                if estimada.exists():
+                                    montoali=float(estimada[0].estimado)*rubro.alicuota
+                                    if montout>montoali:
+                                        subtotal-=montout
+                                    else:
+                                        subtotal-=montoali
+
+                self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':subtotal})
+            else:
+                formu.fields['rubros'].queryset = self.query
 
         return self.get_form_step_data(form)
 

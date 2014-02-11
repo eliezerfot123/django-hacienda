@@ -22,6 +22,7 @@ class Contribuyente(models.Model):
     direccion=models.CharField(null=True,blank=True,max_length=300)
     rubro=models.ManyToManyField(Rubro,null=True,blank=True)
     modificado=models.DateField(auto_now_add=True, auto_now=True)
+    creado=models.DateField(auto_now_add=True,)
 
     def __unicode__(self):
         return '%d %s %s %s'%(self.id_contrato,self.num_identificacion,self.nombre,self.representante)

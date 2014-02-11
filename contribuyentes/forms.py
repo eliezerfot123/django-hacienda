@@ -42,24 +42,33 @@ class RubrosWidget(forms.widgets.Select):
         import string
         rubros = {}
         for campo, valor in data.iteritems():
-            if campo.find('rubro-') > -1:
-                rubros.update({string.split(campo, '-')[1]: valor})
+            if campo.find('definitiva-') > -1:
+                datos=string.split(campo,'-')
+                if not datos[1]  in rubros.keys():
+                    rubros[datos[1]]={}
+                rubros[datos[1]].update({string.split(campo, '-')[2]: valor})
         return rubros
     """ Cómo se va a mostrar el widget
     Retorna la lista de los estudiantes con el campo de nota
     """
     def render(self, name, value, attrs=None, choices=()):
         from django.utils.safestring import mark_safe
-        from itertools import chain
+        import datetime 
         if value is None: value = ''
         output = ['<div class="span12">']
-        output.append('<table id="sample-table-1" class="table table-striped table-bordered table-hover">')
-        output.append('<thead><tr><th>NRO</th> <th>Rubro</th> <th>Monto</th></tr></thead>')
-        num = 0
+        output.append('<table id="montos" class="table table-striped table-bordered table-hover">')
+        output.append('<thead><tr><th>Año</th> <th style="width: 300px">Rubro</th> <th>Monto Estimado </th><Th>Monto Definitivo</th></tr></thead>')
         output.append('<tbody>')
-        for codigo, rubro in chain(self.choices, choices):
-            num = num + 1
-            output.append('<tr><th>%s</th><td><label >%s</label><input type="hidden" value="codigo-%s"  name=""/></td><td><input type="text" name="rubro-%s" size="3" /></td></tr>' % (num, rubro, codigo, codigo))
+        for pagos in self.choices.queryset.filter(definitivo=None):
+            output.append('<tr><th>%s</th><th><label >%s</label></th></td><td>'%(pagos.ano,pagos.rubro))
+            if pagos.estimado is None: 
+                output.append('<input type="text" style="width: 100px;" name="estimada-%s-%s" size="3" />'%(pagos.ano, pagos.rubro.codigo))
+            else: 
+                output.append('%s'%(pagos.estimado))
+            output.append('</td>')
+            if pagos.definitivo is None and pagos.ano < datetime.date.today().year:
+                output.append('<td><input type="text"  style="width: 100px;" name="definitiva-%s-%s" size="3" /></td>'%(pagos.ano, pagos.rubro.codigo))
+            output.append('</tr>' )
 
         output.append('<tbody>')
         output.append('</table>')
@@ -75,7 +84,8 @@ class RubrosField(ModelChoiceField):
     def clean(self,values,initial=None):
         return  values
 class ContribuyenteForm(forms.ModelForm):
-    rubro= forms.ModelMultipleChoiceField(queryset=Rubro.objects.all().order_by('codigo'),required=False,label='Rubros')
+    #rubro= forms.ModelMultipleChoiceField(queryset=Rubro.objects.all().order_by('codigo'),required=False,label='Rubros')
+    rubro= forms.ModelMultipleChoiceField(queryset=None,required=False,label='Rubros')
     rubro.widget.attrs['class'] = 'chzn-select span8 col-md-12 form-control'
     rubro.widget.attrs['multiple'] = ''
     rubro.widget.attrs['data-placeholder'] = 'Seleccione Rubro'
@@ -87,14 +97,19 @@ class ContribuyenteForm(forms.ModelForm):
         exclude=['id_contrato',]
         labels={'cedula_rep':'Cédula del Representante','representante':'Representante legal','direccion':'Dirección','num_identificacion':'Cédula/RIF'  }
 
+    
 class RubrosForm(forms.Form):  # [1]
     #rubros = forms.ModelChoiceField(queryset=None, label="Rubros", required=True, empty_label=None)
+
     rubros = RubrosField(queryset=None, label="Rubros", required=True, empty_label=None)
     #rubros.widget = RubrosWidget()
 
+    """
     def clean_rubros(self):
         subtotales={}
-        for (rubroid,monto) in self.cleaned_data.get('rubros').iteritems():
+        import pdb
+        pdb.set_trace()
+        for (ano,rubros) in self.cleaned_data.get('rubros').iteritems():
             rubro=Rubro.objects.get(id=rubroid)
             montout=float(rubro.ut)*107
             montoali=float(monto)*rubro.alicuota
@@ -103,7 +118,11 @@ class RubrosForm(forms.Form):  # [1]
 
             else:
                 subtotales[rubroid]=montoali
+        for (ano,rubros) in self.cleaned_data.get('rubros').iteritems():
+            if '' in rubros.values():
+                raise forms.ValidationError('No debe dejar valor vacíos.', code='invalid')
         return subtotales
+    """
 
 
 """Widget Trimestres"""
