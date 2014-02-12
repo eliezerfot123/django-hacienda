@@ -86,7 +86,7 @@ class EstimadasForm(forms.Form):  # [1]
                         subtotaldef+=montout
                     else:
                         subtotaldef+=montoali
-        return ano,subtotaldef
+        return ano,round(subtotaldef,2)
     
 class RubrosForm(forms.Form):  # [1]
     #rubros = forms.ModelChoiceField(queryset=None, label="Rubros", required=True, empty_label=None)
@@ -139,7 +139,7 @@ class RubrosForm(forms.Form):  # [1]
                                 subtotaldef-=montout
                             else:
                                 subtotaldef-=montoali
-            return ano,subtotaldef
+            return ano,round(subtotaldef,2)
 
 
 class TrimestresField(ModelChoiceField):
