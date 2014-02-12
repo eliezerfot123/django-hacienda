@@ -27,7 +27,7 @@ class ImpuestosForm(forms.Form):  # [0]
 
     def clean_contrib(self):
         data = self.cleaned_data['contrib']
-        return Contribuyente.objects.get(num_identificacion=data.split(" ")[1])
+        return Contribuyente.objects.get(id_contrato=data.split(" ")[0])
 
 
 """Widget Rubros"""
@@ -69,8 +69,7 @@ class RubrosWidget(forms.widgets.Select):
             output.append('<tr><th>%s</th><th><label >%s</label></th></td><td>'%(pagos.ano,pagos.rubro))
             if pagos.estimado is None: 
                 output.append('<input type="text" style="width: 100px;" name="estimada-%s-%s" size="3" />'%(pagos.ano, pagos.rubro.codigo))
-            else: 
-                output.append('<input type="hidden" style="width: 100px;" name="estimada-%s-%s" value="%s" size="3" />'%(pagos.ano, pagos.rubro.codigo,pagos.estimado))
+            else:
                 output.append('%s'%(pagos.estimado))
             output.append('</td>')
             if pagos.definitivo is None and pagos.ano < datetime.date.today().year:
@@ -147,8 +146,8 @@ class TrimestresWidget(forms.widgets.Select):
                 impuesto=string.split(campo, '-')
                 #impuestos.update({data[1]:{[data[0]]:valor}})
                 if not impuesto[1] in impuestos.keys():
-                    impuestos[impuesto[1]]={}
-                impuestos[impuesto[1]].update({impuesto[0]:valor})
+                    impuestos[impuesto[1]]={impuesto[2]:{}}
+                impuestos[impuesto[1]][impuesto[2]].update({impuesto[0]:valor})
         return impuestos
 
     def render(self, name, value, attrs=None, choices=()):

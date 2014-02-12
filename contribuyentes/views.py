@@ -97,6 +97,7 @@ class LiquidacionWizard(SessionWizardView):
                                         subtotaldef-=montout
                                     else:
                                         subtotaldef-=montoali
+                    """
                     elif ano==datetime.datetime.today().year:
                         estimadas=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano).exclude(estimado=None)
                         if estimadas.exists():
@@ -114,8 +115,8 @@ class LiquidacionWizard(SessionWizardView):
                                 else:
                                     subtotalest+=montoali
 
-
-                self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':{'2013':subtotaldef,'2014':subtotalest}})
+                    """
+                    self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':{ano:subtotaldef}})
             else:
                 formu.fields['rubros'].queryset = self.query
 
@@ -125,7 +126,7 @@ class LiquidacionWizard(SessionWizardView):
         #do_something_with_the_form_data(form_list)
         import calendar
         import datetime
-        liquidacion=Liquidacion2(ano=datetime.date.today().year,deposito=form_list[2].cleaned_data['numero'],emision=datetime.date.today(),contribuyente=form_list[0].cleaned_data['contrib'],vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),observaciones=form_list[2].cleaned_data['observaciones'],liquidador=self.request.user)
+        liquidacion=Liquidacion2(ano=form_list[2].cleaned_data['trimestre'].values()[0].keys()[0],deposito=form_list[2].cleaned_data['numero'],emision=datetime.date.today(),contribuyente=form_list[0].cleaned_data['contrib'],vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),observaciones=form_list[2].cleaned_data['observaciones'],liquidador=self.request.user)
         liquidacion.save()
         for ano,rubros in self.get_all_cleaned_data()['rubros'].iteritems():
             monto=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano,definitivo=None)
@@ -136,9 +137,9 @@ class LiquidacionWizard(SessionWizardView):
                     definitiva.definitivo=rubros[montos]
                     definitiva.save()
 
-
         for impuesto,pagos in form_list[2].cleaned_data['trimestre'].iteritems():
             ut=UT.objects.filter(ano=datetime.date.today().year-1)[0]
+            pagos=pagos.values()[0]
 
             pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'],ut=ut)
             pago.save()
