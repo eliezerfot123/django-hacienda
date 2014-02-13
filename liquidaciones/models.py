@@ -48,7 +48,7 @@ class Liquidacion2(models.Model):
     liquidador=models.ForeignKey(User)
     contribuyente=models.ForeignKey(Contribuyente)
     vencimiento=models.DateField()
-    observaciones=models.CharField(max_length=200,blank=True,null=True)
+    observaciones=models.TextField(max_length=200,blank=True,null=True)
 
     def save(self):
         if not self.id:

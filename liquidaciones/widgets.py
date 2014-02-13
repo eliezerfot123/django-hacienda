@@ -65,7 +65,7 @@ class TrimestresWidget(forms.widgets.Select):
         import string
         impuestos= {}
         for campo, valor in data.iteritems():
-            if campo.find('descuento-') > -1 or campo.find('trimestres-') > -1 or campo.find('intereses-')>-1 or campo.find('cancelado-')>-1or campo.find('monto-') > -1 or campo.find('recargo-')>-1:
+            if campo.find('descuento-') > -1 or campo.find('trimestres-') > -1 or campo.find('intereses-')>-1 or campo.find('cancelado-')>-1or campo.find('monto-') > -1 or campo.find('recargo-')>-1 or campo.find('credito-')>-1:
                 impuesto=string.split(campo, '-')
                 #impuestos.update({data[1]:{[data[0]]:valor}})
                 if not impuesto[1] in impuestos.keys():

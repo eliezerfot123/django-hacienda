@@ -126,12 +126,12 @@ class LiquidacionWizard(SessionWizardView):
 
                 """ Busca de credito fiscal """
             credit,creado=Credito.objects.get_or_create(contribuyente=self.get_all_cleaned_data()['contrib'])
-            credit.monto+=credito
+            credit.monto=credito
             credit.save()
             if liquidacion.tipo=='DEF':
                 credito=0.0
 
-            pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'],ut=ut,credito_fiscal=credit.monto)
+            pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'],ut=ut,credito_fiscal=pagos['credito'])
             pago.save()
 
         return HttpResponseRedirect("/reporte/liquidacion/%s/" % liquidacion.numero)
