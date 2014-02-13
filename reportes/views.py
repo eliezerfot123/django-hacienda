@@ -260,7 +260,7 @@ def liquidacion_report(request, liquidacion):
             monto = monto + round(pago.monto,2)
 
         tabla.append([hpago7, '', hpago8, hpago10, hpago4, hpago5, hpago9])
-        tabla.append([credito, '', pago.descuento, cancelado, recargo, intereses, monto-credito])
+        tabla.append([credito, '', pago.descuento, pago.monto, pago.recargo, intereses, pago.cancelado])
 
         t = Table(tabla, colWidths=(2.0*cm, 2.0*cm, 3.5*cm, 3.5*cm, 3.5*cm, 2.0*cm, 2.2*cm))
         t.setStyle(TableStyle(x))
