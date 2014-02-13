@@ -44,9 +44,8 @@ class RubrosField(ModelChoiceField):
         return  values
 
 class ContribuyenteForm(forms.ModelForm):
-    #rubro= forms.ModelMultipleChoiceField(queryset=Rubro.objects.all().order_by('codigo'),required=False,label='Rubros')
-    rubro= forms.ModelMultipleChoiceField(queryset=None,required=False,label='Rubros')
-    rubro.widget.attrs['class'] = 'chzn-select span8 col-md-12 form-control'
+    rubro= forms.ModelMultipleChoiceField(queryset=Rubro.objects.all().order_by('codigo'),required=False,label='Rubros')
+    rubro.widget.attrs['class'] = 'chzn-select span6 col-md-12 form-control'
     rubro.widget.attrs['multiple'] = ''
     rubro.widget.attrs['data-placeholder'] = 'Seleccione Rubro'
     rubro.widget.attrs['value'] = ''
@@ -89,7 +88,7 @@ class EstimadasForm(forms.Form):  # [1]
                     else:
                         subtotaldef+=montoali
         return ano,round(subtotaldef,2)
-    
+
 class RubrosForm(forms.Form):  # [1]
     #rubros = forms.ModelChoiceField(queryset=None, label="Rubros", required=True, empty_label=None)
 

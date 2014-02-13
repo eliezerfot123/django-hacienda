@@ -9,7 +9,6 @@ class LiquidacionAdmin(admin.ModelAdmin):
     ordering = ['numero']
 admin.site.register(Liquidacion, LiquidacionAdmin)
 
-admin.site.register(UT) 
 
 class Liquidacion2Admin(admin.ModelAdmin):
     search_fields = ['numero']
@@ -40,3 +39,9 @@ class Pago2Admin(admin.ModelAdmin):
                     'trimestres', 'intereses',
                     'recargo', 'monto']
 admin.site.register(Pago2, Pago2Admin)
+
+
+class UTAdmin(admin.ModelAdmin):
+    search_fields = ['ano', 'valor']
+    list_display = ['ano', 'valor']
+admin.site.register(UT, UTAdmin)

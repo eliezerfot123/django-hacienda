@@ -14,6 +14,8 @@ from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm,Cont
 from django.views.generic.edit import CreateView, UpdateView
 from contribuyentes.models import Contribuyente,Credito
 from django.db import transaction
+
+
 class ContribuyenteCrear(CreateView):
     model=Contribuyente
     template_name = 'contribuyente_crear.html'

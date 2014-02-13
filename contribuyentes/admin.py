@@ -20,3 +20,9 @@ class LicenciaAdmin(admin.ModelAdmin):
     list_display = ['serial','control', 'numero', 'cantidad', 'emision', 'valido', 'contribuyente']
     ordering = ['serial']
 admin.site.register(Licencia, LicenciaAdmin)
+
+class MontoAdmin(admin.ModelAdmin):
+    search_fields = ['contribuyente__num_identificacion', 'ano', 'rubro__codigo']
+    list_display = ['contribuyente', 'estimado', 'definitivo', 'ano', 'rubro']
+    ordering = ['-ano']
+admin.site.register(Monto, MontoAdmin)
