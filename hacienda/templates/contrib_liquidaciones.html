@@ -225,7 +225,7 @@
 												    </label>
 												</td>
 
-												<td>{{ contrib.liquidacion.num_liquidacion }}</td>
+												<td>{{ contrib.liquidacion.numero}}</td>
 												<td>{{ contrib.liquidacion.contribuyente }}</td>
 												<td>{{ contrib.liquidacion.deposito }}</td>
 												<td>{{ contrib.liquidacion.emision }}</td>
@@ -237,6 +237,11 @@
 												<td>{{ contrib.recargo }}</td>
 												<td>{{ contrib.intereses }}</td>
 												<td>{{ contrib.liquidacion.observaciones }}</td>
+                                                <td>
+														<a class="blue" href="/reporte/liquidacion/{{contrib.liquidacion.numero }}" title="Ver Liquidacion">
+															<i class="icon-zoom-in bigger-130"></i>
+														</a>
+                                                </td>
 											</tr>
 										{% endfor %}
                                     {% endif %}
