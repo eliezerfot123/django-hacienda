@@ -44,10 +44,11 @@ class Liquidacion2(models.Model):
     modopago=models.CharField(max_length=2,choices=(('CH','Cheque'),('DP','Deposito')),default='DP')
     fecha_pago=models.DateField(null=True)
     emision=models.DateField()
+    tipo=models.CharField(max_length=3,choices=(('EST','Estimada'),('DEF','Definitiva'),('SND','Sin Definir')), default='SND')
     liquidador=models.ForeignKey(User)
     contribuyente=models.ForeignKey(Contribuyente)
     vencimiento=models.DateField()
-    observaciones=models.CharField(max_length=200)
+    observaciones=models.CharField(max_length=200,blank=True,null=True)
 
     def save(self):
         if not self.id:
@@ -73,6 +74,7 @@ class Pago2(models.Model):
     recargo=models.FloatField(default=0.0)
     monto=models.FloatField() # Sub-Total
     cancelado=models.FloatField() # ToTal
+    credito_fiscal=models.FloatField(null=True,default=0.0)
 
 
 

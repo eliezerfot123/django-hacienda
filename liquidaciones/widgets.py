@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from django import forms
 from django.db.models import Q
+from contribuyentes.models import Credito
 
 """Widget Rubros"""
 class RubrosWidget(forms.widgets.Select):
@@ -53,7 +54,7 @@ class RubrosWidget(forms.widgets.Select):
         output.append('</div>')
         return mark_safe('\n'.join(output))
 
-"""Widget Trimestres"""
+"""Widget Trimestres (DEFINITIVA)"""
 class TrimestresWidget(forms.widgets.Select):
     attrs = {}
 
@@ -78,7 +79,15 @@ class TrimestresWidget(forms.widgets.Select):
         if value is None: value = ''
         output = ['<div class="span12">']
         output.append('<table id="sample-table-1" class="table table-striped table-bordered table-hover">')
-        output.append('<thead><tr><th>A&ntilde;o</th><th>C&oacute;digo</th><th>Impuesto</th>  <th>Monto</th><th>Recargo</th> <th>Intereses</th><th>Trimestres</th><th>% Descuento</th> <th>Subtotal</th></tr></thead>')
+        output.append('<thead><tr><th>A&ntilde;o</th><th>C&oacute;digo</th><th>Impuesto</th>  <th>Monto</th><th>Recargo</th> <th>Intereses</th><th>Trimestres</th><th>% Descuento</th>')
+        credito=Credito.objects.filter(contribuyente=self.choices[0]['contribuyente']).exclude(monto=0.0)
+        output.append('<th>Cr&eacute;dito Fiscal</th>')
+        if credito.exists():
+            credito=credito[0].monto
+        else:
+            credito=0.0
+
+        output.append(' <th>Subtotal</th></tr></thead>')
         num = 0
         output.append('<tbody>')
         if not self.choices[0] is  None:
@@ -90,7 +99,7 @@ class TrimestresWidget(forms.widgets.Select):
                         output.append('<option value="%(trimestre)s">%(trimestre)s</option>'%({'trimestre':trim}))
 
 
-                    output.append('</select></div></td><td><div class="controls"><input name="descuento-%(impuesto)s-%(ano)s" type="text"  style="width: 60px" value="0"/></div></td><td><div id="subtotal-%(impuesto)s-%(ano)s">%(monto)s</div> BsF.</td><input type="hidden" name="cancelado-%(impuesto)s-%(ano)s" value="%(monto)s" /> </tr>'%({'impuesto':impuesto['impuesto'].codigo,'monto':monto,'ano':ano} ))
+                    output.append('</select></div></td><td><div class="controls"><input name="descuento-%(impuesto)s-%(ano)s" type="text"  style="width: 60px" value="0"/></div></td><td><input type="hidden" name="credito-%(impuesto)s-%(ano)s" value="%(credito)s"/>%(credito)s</td><td><div id="subtotal-%(impuesto)s-%(ano)s">%(monto)s</div> BsF.</td><input type="hidden" name="cancelado-%(impuesto)s-%(ano)s" value="%(monto)s" /> </tr>'%({'impuesto':impuesto['impuesto'].codigo,'monto':monto,'ano':ano,'credito':credito} ))
 
             output.append('</tbody>')
             output.append('</table>')

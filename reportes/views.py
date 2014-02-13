@@ -236,18 +236,21 @@ def liquidacion_report(request, liquidacion):
         # Fin Headers de la tabla
 
         tabla.append([hdatos, '', hdatos1, hdatos2, hdatos3, hdatos4, ''])
-        tabla.append([liquid.emision, '', liquid.vencimiento, liquid.pk, liquid.numero, liquid.deposito, ''])
+        tabla.append([liquid.emision, '', liquid.vencimiento, liquid.contribuyente.id_contrato, liquid.numero, liquid.deposito, ''])
         pos = 0
         recargo = 0
         intereses = 0
         cancelado = 0
         monto = 0
         for pago in pagos:
-
+            if liquid.tipo=='EST':
+                credito=pago.credito_fiscal
+            else:
+                credito=0
             if pos == 0:
                 tabla.append([hPagos])
                 tabla.append([hpago, hpago1, hpago2, hpago3, hpago4, hpago5, hpago6])
-            tabla.append([liquid.ano, pago.impuesto.codigo, pago.impuesto.descripcion, round(pago.monto,2), round(pago.recargo,2), round(pago.intereses,2), round(pago.cancelado,2)])
+            tabla.append([liquid.ano, pago.impuesto.codigo, pago.impuesto.descripcion, round(pago.monto,2), round(pago.recargo,2), round(pago.intereses,2), round(pago.monto,2)])
 
             pos = pos + 1
 
@@ -257,7 +260,7 @@ def liquidacion_report(request, liquidacion):
             monto = monto + round(pago.monto,2)
 
         tabla.append([hpago7, '', hpago8, hpago10, hpago4, hpago5, hpago9])
-        tabla.append(['0', '', pago.descuento, cancelado, recargo, intereses, monto])
+        tabla.append([credito, '', pago.descuento, cancelado, recargo, intereses, monto-credito])
 
         t = Table(tabla, colWidths=(2.0*cm, 2.0*cm, 3.5*cm, 3.5*cm, 3.5*cm, 2.0*cm, 2.2*cm))
         t.setStyle(TableStyle(x))
