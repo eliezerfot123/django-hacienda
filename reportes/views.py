@@ -247,14 +247,14 @@ def liquidacion_report(request, liquidacion):
             if pos == 0:
                 tabla.append([hPagos])
                 tabla.append([hpago, hpago1, hpago2, hpago3, hpago4, hpago5, hpago6])
-            tabla.append([liquid.ano, pago.impuesto.codigo, pago.impuesto.descripcion, pago.monto, pago.recargo, pago.intereses, pago.cancelado])
+            tabla.append([liquid.ano, pago.impuesto.codigo, pago.impuesto.descripcion, round(pago.monto,2), round(pago.recargo,2), round(pago.intereses,2), round(pago.cancelado,2)])
 
             pos = pos + 1
 
             recargo = recargo + pago.recargo
             intereses = intereses + pago.intereses
             cancelado = cancelado + pago.cancelado
-            monto = monto + pago.monto
+            monto = monto + round(pago.monto,2)
 
         tabla.append([hpago7, '', hpago8, hpago10, hpago4, hpago5, hpago9])
         tabla.append(['0', '', pago.descuento, cancelado, recargo, intereses, monto])
