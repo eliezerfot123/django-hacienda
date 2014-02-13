@@ -170,11 +170,13 @@ def liquidacion_report(request, liquidacion):
         contrib1 = Paragraph('<b>INFORMACION GENERAL DEL CONTRIBUYENTE</b>', estilo_contrib)
         contrib2 = Paragraph('%s' % liquid.contribuyente.nombre, estilo_contrib)
         contrib3 = Paragraph('<b>CI/RIF:</b> %s ' % (liquid.contribuyente.num_identificacion), estilo_contrib)
+        contrib4 = Paragraph('%s' % liquid.contribuyente.direccion, estilo_contrib)
 
         tabla_contrib = []
         tabla_contrib.append([contrib1])
         tabla_contrib.append([contrib2])
         tabla_contrib.append([contrib3])
+        tabla_contrib.append([contrib4])
 
         tabla_contrib = Table(tabla_contrib, colWidths=(12.0*cm))
         tabla_contrib.setStyle(TableStyle(contrib_style))
