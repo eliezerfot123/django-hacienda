@@ -225,18 +225,18 @@
 												    </label>
 												</td>
 
-												<td>{{ contrib.num_liquidacion }}</td>
-												<td>{{ contrib.contribuyente }}</td>
-												<td>{{ contrib.deposito }}</td>
-												<td>{{ contrib.emision }}</td>
-												<td>{{ contrib.vencimiento }}</td>
-                                                <td>{{ contrib.fecha_pago }}</td>
+												<td>{{ contrib.liquidacion.num_liquidacion }}</td>
+												<td>{{ contrib.liquidacion.contribuyente }}</td>
+												<td>{{ contrib.liquidacion.deposito }}</td>
+												<td>{{ contrib.liquidacion.emision }}</td>
+												<td>{{ contrib.liquidacion.vencimiento }}</td>
+                                                <td>{{ contrib.liquidacion.fecha_pago }}</td>
 												<td>{{ contrib.credito_fiscal }}</td>
 												<td>{{ contrib.descuento }}</td>
 												<td>{{ contrib.impuesto }}</td>
 												<td>{{ contrib.recargo }}</td>
 												<td>{{ contrib.intereses }}</td>
-												<td>{{ contrib.observaciones }}</td>
+												<td>{{ contrib.liquidacion.observaciones }}</td>
 											</tr>
 										{% endfor %}
                                     {% endif %}
