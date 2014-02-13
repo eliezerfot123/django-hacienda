@@ -7,7 +7,7 @@ class Rubro(models.Model):
     alicuota=models.FloatField()
     ut=models.IntegerField()
     def __unicode__(self):
-        return '%d %s (%d UT)'%(self.codigo,self.rubro,self.ut)
+        return '%d %s (%d UT)(%s alicuota)'%(self.codigo,self.rubro,self.ut,self.alicuota)
 
 class Contribuyente(models.Model):
     id_contrato=models.IntegerField(unique=True,null=True)
@@ -43,6 +43,12 @@ class Contribuyente(models.Model):
     def liquidaciones(self,contrib):
         from liquidaciones.models import Pago
         return Pago.objects.filter(contribuyente=self)
+
+class Credito(models.Model):
+
+    monto=models.FloatField(default=0.0)
+    contribuyente=models.ForeignKey(Contribuyente)
+    modificado=models.DateTimeField(auto_now=True)
 
 class Monto(models.Model):
     contribuyente=models.ForeignKey(Contribuyente)
