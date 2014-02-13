@@ -9,6 +9,7 @@ class LiquidacionAdmin(admin.ModelAdmin):
     ordering = ['numero']
 admin.site.register(Liquidacion, LiquidacionAdmin)
 
+admin.site.register(UT) 
 
 class Liquidacion2Admin(admin.ModelAdmin):
     search_fields = ['numero']
