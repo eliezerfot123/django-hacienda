@@ -12,10 +12,10 @@ function calcular(event)
         var recargo=parseFloat($('[name=recargo-'+impuesto+'-'+ano+']')[0].value/100)||0;
         var descuento=parseFloat($('[name=descuento-'+impuesto+'-'+ano+']')[0].value/100);
         var subtotal=$('#subtotal-'+impuesto+'-'+ano);
-        monto=monto-credito;
-        calculo=(monto/4)*trimestres
-
-        calculo=calculo+(calculo*recargo)+(calculo*intereses)-(calculo*descuento)
+        monto=monto-(monto*descuento);
+        calculo=monto-credito;
+        calculo=(calculo/4)*trimestres
+        calculo=calculo+(calculo*recargo)+(calculo*intereses);
         cancelado.value=calculo;
     subtotal.text(calculo)
 
