@@ -38,11 +38,11 @@ class Contribuyente(models.Model):
                                                                  'cedula_rep', 'capital', 'direccion', 'modificado'])
 
     def licencias(self,):
-        return Licencia.object.filter(contribuyente=self.pk)
+        return Licencia2.object.filter(contribuyente=self.pk)
 
     def liquidaciones(self,contrib):
-        from liquidaciones.models import Pago
-        return Pago.objects.filter(contribuyente=self)
+        from liquidaciones.models import Pago2
+        return Pago2.objects.filter(liquidacion__contribuyente=self)
 
 class Credito(models.Model):
 
