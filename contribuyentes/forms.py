@@ -99,8 +99,6 @@ class RubrosForm(forms.Form):  # [1]
     """
     def clean_rubros(self):
         subtotales={}
-        import pdb
-        pdb.set_trace()
         for (ano,rubros) in self.cleaned_data.get('rubros').iteritems():
             rubro=Rubro.objects.get(id=rubroid)
             montout=float(rubro.ut)*107
@@ -142,7 +140,7 @@ class RubrosForm(forms.Form):  # [1]
                                 subtotaldef-=montout
                             else:
                                 subtotaldef-=montoali
-            return ano,round(subtotaldef,2)
+        return ano,round(subtotaldef,2)
 
 
 class TrimestresField(ModelChoiceField):
