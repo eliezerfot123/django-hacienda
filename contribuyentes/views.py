@@ -41,6 +41,20 @@ class ContribuyenteEditar(UpdateView):
         return super(ContribuyenteEditar, self).form_valid(form)
 
 
+def actividad_eco(wizard):
+    if wizard.get_cleaned_data_for_step('0'):
+        return wizard.get_cleaned_data_for_step('0')['impuesto'].id==1
+def definitiva(wizard):
+    if wizard.get_cleaned_data_for_step('1'):
+        print wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')
+        return wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')=='def'
+
+def estimada(wizard):
+    if wizard.get_cleaned_data_for_step('1'):
+        print wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')
+
+        return wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')=='est'
+
 class LiquidacionWizard(SessionWizardView):
     form_list = [ImpuestosForm, RubrosForm, LiquidacionForm]
     template_name = 'crear_pago.html'
@@ -49,16 +63,16 @@ class LiquidacionWizard(SessionWizardView):
     query=None
     montos=None
 
-
     def get_form(self, step=None, data=None, files=None):
         formu = super(LiquidacionWizard, self).get_form(step, data, files)
 
         if step is None:
             step = self.steps.current
+        
+        if formu.fields.get('rubros') :
+            formu.fields['rubros'].queryset = Monto.objects.filter(contribuyente=self.get_cleaned_data_for_step('0')['contrib'])
 
-        if step == '1' :
-            formu.fields['rubros'].queryset = self.query
-        elif step=='2' :
+        elif formu.fields.get('trimestre') :
             formu.fields['trimestre'].choices=[self.montos]
 
         return formu
@@ -70,7 +84,7 @@ class LiquidacionWizard(SessionWizardView):
             self.impuesto = form.cleaned_data['impuesto']
             self.query = Monto.objects.filter(contribuyente=form.cleaned_data['contrib'])
 
-        elif self.steps.current == '1':
+        elif self.steps.current == '2':
             subtotaldef=0.0
             subtotalest=0.0
             if form.is_valid():

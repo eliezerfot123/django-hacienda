@@ -1,6 +1,8 @@
 # -*- coding: utf8 -*-
 from django import forms
 from liquidaciones.models import Pago2,Liquidacion2
+class TipoLiqEconomica(forms.Form):
+    tipo_liquidacion=forms.ChoiceField(label='Tipo de liquidacion',choices=(('est','Estimada'),('def','Definitiva')))
 
 class PagoForm(forms.Form):
     liquidacion=forms.CharField(label="Nro. Liquidación")
