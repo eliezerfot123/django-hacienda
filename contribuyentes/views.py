@@ -43,7 +43,7 @@ class ContribuyenteEditar(UpdateView):
 
 def actividad_eco(wizard):
     if wizard.get_cleaned_data_for_step('0'):
-        return wizard.get_cleaned_data_for_step('0')['impuesto'].id==1
+        return wizard.get_cleaned_data_for_step('0')['impuesto'].codigo==301020700
 def definitiva(wizard):
     if wizard.get_cleaned_data_for_step('1'):
         print wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')
