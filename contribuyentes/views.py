@@ -79,12 +79,10 @@ class LiquidacionWizard(SessionWizardView):
 
     def process_step(self, form):
         import datetime
-
         if self.steps.current == '0':
             self.impuesto = form.cleaned_data['impuesto']
             self.query = Monto.objects.filter(contribuyente=form.cleaned_data['contrib'])
-
-        elif self.steps.current == '2':
+        if 'procesar' in dir(form): 
             subtotaldef=0.0
             subtotalest=0.0
             if form.is_valid():
@@ -108,7 +106,7 @@ class LiquidacionWizard(SessionWizardView):
                                 subtotalest+=montoali
 
                 """
-                self.montos = dict({'impuesto':self.get_all_cleaned_data()['impuesto'],'montos':{ano:subtotaldef},'contribuyente':self.get_all_cleaned_data()['contrib']})
+                self.montos = dict({'impuesto':self.get_cleaned_data_for_step('0')['impuesto'],'montos':{ano:subtotaldef},'contribuyente':self.get_cleaned_data_for_step('0')['contrib']})
             else:
                 formu.fields['rubros'].queryset = self.query
 
