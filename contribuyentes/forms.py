@@ -66,7 +66,7 @@ class EstimadasField(ModelChoiceField):
 
 class EstimadasForm(forms.Form):  # [1]
     rubros= EstimadasField(queryset=None, label="Rubros", required=True, empty_label=None)
-    tipo=forms.CharField(widget=forms.HiddenInput(),initial='EST')
+    tipo='EST'
     def procesar(self,wizard,form):
         import datetime
         subtotaldef=0.0
@@ -93,7 +93,7 @@ class RubrosForm(forms.Form):  # [1]
     #rubros = forms.ModelChoiceField(queryset=None, label="Rubros", required=True, empty_label=None)
 
     rubros = RubrosField(queryset=None, label="Rubros", required=True, empty_label=None)
-    tipo=forms.CharField(widget=forms.HiddenInput(),initial='DEF')
+    tipo='DEF'
     #rubros.widget = RubrosWidget()
 
     """
