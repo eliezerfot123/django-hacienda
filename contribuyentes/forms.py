@@ -9,7 +9,7 @@ from django.forms import ModelForm, TextInput, Textarea,Select,DateInput
 from django.forms.models import ModelChoiceField
 
 from contribuyentes.models import Rubro, Contribuyente,Monto
-from liquidaciones.widgets import RubrosWidget,TrimestresWidget,EstimadasWidget
+from liquidaciones.widgets import RubrosWidget, TrimestresWidget, EstimadasWidget, AgregarEstimadoWidget
 import datetime
 
 
@@ -151,6 +151,17 @@ class TrimestresField(ModelChoiceField):
     """ Validar la data introducida """
     def clean(self,values,initial=None):
         return  values
+
+
+class AgregarEstimadoField(ModelChoiceField):
+    widget = AgregarEstimadoWidget
+
+    def clean(self, values, initial=None):
+        return values
+
+
+class AgregarEstimadoForm(forms.Form):  # [1] Opcional sino tiene estimada.
+    estimado = AgregarEstimadoField(queryset=None, required=True, label='Añadir Nuevos Estimados')
 
 
 class LiquidacionForm(forms.Form):  # [2]

@@ -26,7 +26,7 @@ class Liquidacion(models.Model):
     intereses=models.FloatField()
     impuesto=models.ForeignKey(Impuesto)
     emision=models.DateField()
-    liquidador=models.ForeignKey(User)
+    liquidador=models.ForeignKey(User,null=True)
 
     def __unicode__(self):
         return '%s - %s' % (self.numero, self.monto)
@@ -75,6 +75,8 @@ class Pago2(models.Model):
     monto=models.FloatField() # Sub-Total
     cancelado=models.FloatField() # ToTal
     credito_fiscal=models.FloatField(null=True,default=0.0)
+    def __unicode__(self):
+        return '%s'%self.cancelado
 
 
 

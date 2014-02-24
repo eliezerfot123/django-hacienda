@@ -32,7 +32,7 @@ class RubrosWidget(forms.widgets.Select):
     """
     def render(self, name, value, attrs=None, choices=()):
         from django.utils.safestring import mark_safe
-        import datetime 
+        import datetime
         if value is None: value = ''
         output = ['<div class="span12">']
         output.append('<table id="montos" class="table table-striped table-bordered table-hover">')
@@ -40,7 +40,7 @@ class RubrosWidget(forms.widgets.Select):
         output.append('<tbody>')
         for pagos in self.choices.queryset.filter(definitivo=None):
             output.append('<tr><th>%s</th><th><label >%s</label></th></td><td>'%(pagos.ano,pagos.rubro))
-            if pagos.estimado is None: 
+            if pagos.estimado is None:
                 output.append('<input type="text" style="width: 100px;" name="estimada-%s-%s" size="3" />'%(pagos.ano, pagos.rubro.codigo))
             else:
                 output.append('%s'%(pagos.estimado))
@@ -53,6 +53,28 @@ class RubrosWidget(forms.widgets.Select):
         output.append('</table>')
         output.append('</div>')
         return mark_safe('\n'.join(output))
+
+class AgregarEstimadoWidget(RubrosWidget):
+    def render(self, name, value, attrs=None, choices=()):
+        from django.utils.safestring import mark_safe
+        import datetime
+        if value is None: value = ''
+        output = ['<div class="span12">']
+        output.append('<table id="montos" class="table table-striped table-bordered table-hover">')
+        output.append(u'<thead><tr><th>Año</th> <th style="width: 300px">Rubro</th> <th>Monto Estimado </th></tr></thead>')
+        output.append('<tbody>')
+        for pagos in self.choices.queryset:
+            output.append(u'<tr><th>%s</th><th><label >%s</label></th></td><td>'%(datetime.date.today().year, pagos.rubro))
+            output.append('<input type="text" style="width: 100px;" name="estimada-%s-%s" size="3" />'%(datetime.date.today().year, pagos.codigo))
+            output.append('</td>')
+            output.append('</tr>' )
+
+        output.append('<tbody>')
+        output.append('</table>')
+        output.append('</div>')
+        return mark_safe('\n'.join(output))
+
+
 
 """Widget Trimestres (DEFINITIVA)"""
 class TrimestresWidget(forms.widgets.Select):
@@ -131,22 +153,22 @@ class EstimadasWidget(forms.widgets.Select):
     """
     def render(self, name, value, attrs=None, choices=()):
         from django.utils.safestring import mark_safe
-        import datetime 
+        import datetime
         if value is None: value = ''
         output = ['<div class="span12">']
         output.append('<table id="montos" class="table table-striped table-bordered table-hover">')
-        output.append('<thead><tr><th>Año</th> <th style="width: 300px">Rubro</th> <th>Monto Estimado </th></tr></thead>')
+        output.append(u'<thead><tr><th>Año</th> <th style="width: 300px">Rubro</th> <th>Monto Estimado </th></tr></thead>')
         output.append('<tbody>')
         for pagos in self.choices.queryset.filter(Q(estimado=None)|Q(ano=datetime.date.today().year)):
-            output.append('<tr><th>%s</th><th><label >%s</label></th></td><td>'%(pagos.ano,pagos.rubro))
-            if pagos.estimado is None: 
-                output.append('<input type="text" style="width: 100px;" name="estimada-%s-%s" size="3" />'%(pagos.ano, pagos.rubro.codigo))
+            output.append(u'<tr><th>%s</th><th><label >%s</label></th></td><td>'%(pagos.ano,pagos.rubro))
+            if pagos.estimado is None:
+                output.append(u'<input type="text" style="width: 100px;" name="estimada-%s-%s" size="3" />'%(pagos.ano, pagos.rubro.codigo))
             elif   pagos.ano == datetime.date.today().year:
-                output.append('%s <input type="hidden" name="estimada-%s-%s" value="%s" />'%(pagos.estimado,pagos.ano, pagos.rubro.codigo,pagos.estimado))
+                output.append(u'%s <input type="hidden" name="estimada-%s-%s" value="%s" />'%(pagos.estimado,pagos.ano, pagos.rubro.codigo,pagos.estimado))
             output.append('</td>')
             output.append('</tr>' )
 
-        output.append('<tbody>')
+        output.append('</tbody>')
         output.append('</table>')
         output.append('</div>')
         return mark_safe('\n'.join(output))

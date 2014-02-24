@@ -11,10 +11,14 @@ admin.site.register(Liquidacion, LiquidacionAdmin)
 
 
 class Liquidacion2Admin(admin.ModelAdmin):
+
+    def pagos2(self, obj):
+        pagos=[str(pago['cancelado']) for pago in obj.pago2_set.all().values('cancelado')]
+        return ("%s  " % (', '.join(pagos) ))
     search_fields = ['numero']
-    list_display = ['numero', 'deposito', 'contribuyente',
+    list_display = ('numero', 'deposito', 'contribuyente',
                     'fecha_pago', 'ano', 'modopago',
-                    'emision', 'vencimiento', 'liquidador']
+                    'emision', 'vencimiento', 'liquidador','pagos2')
     ordering = ['emision']
 admin.site.register(Liquidacion2, Liquidacion2Admin)
 

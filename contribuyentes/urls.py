@@ -12,6 +12,6 @@ urlpatterns = patterns('',
                             ImpuestosForm, RubrosForm,
                             LiquidacionForm]), login_url='/login/'), name="cargar-liquid"),
     url(r'crear_estimada/$', login_required(LiquidacionWizard.as_view([
-                            ImpuestosForm, EstimadasForm,
+                            ImpuestosForm, AgregarEstimadoForm,  EstimadasForm,
                             LiquidacionForm]), login_url='/login/'), name="cargar-estim"),
 )
