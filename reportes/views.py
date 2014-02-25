@@ -133,9 +133,9 @@ def liquidacion_report(request, liquidacion):
         cabecera = styleSheet['Normal']
         cabecera.alignment = TA_CENTER
         cabecera.firstLineIndent = 0
-        cabecera.fontSize = 6
+        cabecera.fontSize = 7.5
         cabecera.fontName = 'Helvetica-Bold'
-        cabecera.leftIndent = -380
+        cabecera.leftIndent = -370
         cabecera.leading = 7
 
         logo = Image(settings.STATIC_ROOT+'/reportes/escudo.jpg',
@@ -157,7 +157,7 @@ def liquidacion_report(request, liquidacion):
         styleSheet2 = getSampleStyleSheet()
         estilo_contrib = styleSheet2['BodyText']
         estilo_contrib.alignment = TA_CENTER
-        estilo_contrib.fontSize = 7
+        estilo_contrib.fontSize = 7.5
         estilo_contrib.fontName = 'Times-Roman'
         estilo_contrib.leading = 6
         contrib_style = [
@@ -190,7 +190,7 @@ def liquidacion_report(request, liquidacion):
 
         estilo_tabla = styleSheet['BodyText']
         estilo_tabla.alignment = TA_CENTER
-        estilo_tabla.fontSize = 6
+        estilo_tabla.fontSize = 7.5
         estilo_tabla.leading = 7
         x = [
             ('BACKGROUND', (0, 0), (6, 0), colors.silver),
@@ -202,7 +202,7 @@ def liquidacion_report(request, liquidacion):
             ('BOX', (0, 9), (6, 0), 0.50, colors.black),
             ('GRID', (0, 0), (-1, -1), 0.50, colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONT', (0, 0), (-1, -1), "Helvetica", 6),
+            ('FONT', (0, 0), (-1, -1), "Helvetica", 8),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ]
         tabla = []
@@ -272,7 +272,7 @@ def liquidacion_report(request, liquidacion):
         #---> Notas <---
         styleSheetNota = getSampleStyleSheet()
         nota = styleSheetNota['Normal']
-        nota.fontSize = 6
+        nota.fontSize = 8
         nota.fontName = 'Helvetica'
         nota.alignment = TA_LEFT
 
@@ -282,7 +282,7 @@ def liquidacion_report(request, liquidacion):
         elementos.append(Spacer(1, 10))
         styleSheet3 = getSampleStyleSheet()
         parrafo = styleSheet3['Normal']
-        parrafo.fontSize = 6
+        parrafo.fontSize = 7
         parrafo.rightIndent = -320
         parrafo.fontName = 'Helvetica'
         parrafo.alignment = TA_CENTER
@@ -301,7 +301,7 @@ def liquidacion_report(request, liquidacion):
         elementos.append(Spacer(1, -42))
         estilo_tabla2 = styleSheet['BodyText']
         estilo_tabla2.alignment = TA_CENTER
-        estilo_tabla2.fontSize = 5
+        estilo_tabla2.fontSize = 7
         y = [
             ('BOX', (0, 0), (-1, -1), 0.50, colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
