@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 
 # Create your models here.
@@ -48,6 +49,7 @@ class Credito(models.Model):
 
     monto=models.FloatField(default=0.0)
     contribuyente=models.ForeignKey(Contribuyente)
+    impuesto=models.ForeignKey("liquidaciones.Impuesto",default=2) # Actividad económica por defecto
     modificado=models.DateTimeField(auto_now=True)
 
 class Monto(models.Model):
