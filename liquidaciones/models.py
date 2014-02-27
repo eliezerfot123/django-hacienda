@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib.auth.models import User
 from contribuyentes.models import Contribuyente
@@ -16,7 +17,15 @@ class Impuesto(models.Model):
     def __unicode__(self):
         return '%s - %s'%(self.codigo,self.descripcion)
 
+class Cuota(models.Model):
+    orden=models.IntegerField()
+    tipo=models.CharField(max_length=4,choices=(('SEM','Semana'),('TRIM','Trimestre'),('MENS','Mensualidad'),('ANUA','Año')))
+    def __unicode__(self):
+        return '%d %s'%(self.orden,self.get_tipo_display())
 
+    class Meta:
+        ordering=['tipo','orden']
+        
 class Liquidacion(models.Model):
     numero=models.CharField(max_length=20)
     trimestre=models.IntegerField()
@@ -26,7 +35,7 @@ class Liquidacion(models.Model):
     intereses=models.FloatField()
     impuesto=models.ForeignKey(Impuesto)
     emision=models.DateField()
-    liquidador=models.ForeignKey(User)
+    liquidador=models.ForeignKey(User,null=True)
 
     def __unicode__(self):
         return '%s - %s' % (self.numero, self.monto)
@@ -44,7 +53,6 @@ class Liquidacion2(models.Model):
     modopago=models.CharField(max_length=2,choices=(('CH','Cheque'),('DP','Deposito')),default='DP')
     fecha_pago=models.DateField(null=True)
     emision=models.DateField()
-    tipo=models.CharField(max_length=3,choices=(('EST','Estimada'),('DEF','Definitiva'),('SND','Sin Definir')), default='SND')
     liquidador=models.ForeignKey(User)
     contribuyente=models.ForeignKey(Contribuyente)
     vencimiento=models.DateField()
@@ -69,12 +77,14 @@ class Pago2(models.Model):
     impuesto=models.ForeignKey(Impuesto)
     ut=models.ForeignKey(UT)
     descuento=models.FloatField(default=0.0)
-    trimestres=models.IntegerField(default=4)
+    trimestres=models.ManyToManyField(Cuota)
     intereses=models.FloatField(default=0.0)
     recargo=models.FloatField(default=0.0)
     monto=models.FloatField() # Sub-Total
     cancelado=models.FloatField() # ToTal
     credito_fiscal=models.FloatField(null=True,default=0.0)
+    tipo=models.CharField(max_length=3,choices=(('EST','Estimada'),('DEF','Definitiva'),('SND','Sin Definir')), default='SND')
+    impuesto=models.ForeignKey(Impuesto)
 
 
 
