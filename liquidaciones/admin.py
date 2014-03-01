@@ -34,9 +34,11 @@ admin.site.register(Pago, PagoAdmin)
 
 
 class Pago2Admin(admin.ModelAdmin):
+    def cuota(self,obj):
+        return ', '.join(['%d %s'%(c.orden, c.get_tipo_display()) for c in obj.trimestres.all()])
     search_fields = ['liquidacion', 'impuesto']
     list_display = ['liquidacion', 'impuesto', 'ut', 'descuento',
-                    'trimestres', 'intereses',
+                    'cuota', 'intereses',
                     'recargo', 'monto']
 admin.site.register(Pago2, Pago2Admin)
 
