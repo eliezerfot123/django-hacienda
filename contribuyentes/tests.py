@@ -9,6 +9,11 @@ class ContribuyenteFactory(factory.DjangoModelFactory):
     num_identificacion=fuzzy.FuzzyInteger(15000000,30000000)
     nombre=fuzzy.FuzzyText()
 
+class MontoFactory(factory.DjangoModelFactory):
+    FACTORY_FOR='contribuyentes.Monto'
+    FACTORY_DJANGO_GET_OR_CREATE=('contribuyente','ano','rubro','estimado')
+    estimado=fuzzy.FuzzyInteger(10000)
+
 class UserFactory(factory.DjangoModelFactory):
        FACTORY_FOR = User
 
