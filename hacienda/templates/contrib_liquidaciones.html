@@ -3,7 +3,7 @@
 <html lang="es">
 	<head>
 		<meta charset="utf-8" />
-		<title>Buscar Contribuyentes .::Hacienda::.</title>
+		<title>Liquidaciones del Contribuyente .::Hacienda::.</title>
 
 		<meta name="description" content="Static &amp; Dynamic Tables" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -181,11 +181,29 @@
 							</div>
 						</div>
 					{% endif %}
+					{% if messages%}
+					    {% for message in messages %}
+					    <div class="alert alert-error">
+
+					        <button class="close" data-dismiss="alert" type="button">
+					            <i class="icon-remove"></i>
+					        </button>
+					        <p>
+					        <i class="icon-info-sign"></i>
+					        Contribuyente ya tiene liquidaciones para el impuesto
+					            <strong> 
+									{{message}}
+					            </strong> 
+					        </p>
+
+					    </div>
+					    {%endfor %}
+					{% endif %}
 
 						<div class="span12">
 							<!--PAGE CONTENT BEGINS-->
 							<div class="row-fluid">
-								<h3 class="header smaller lighter blue">Lista de pagos</h3>
+								<h3 class="header smaller lighter blue">Lista de liquidaciones</h3>
 								<div class="table-header" align="center">
 										Resultado Liquidaciones: <b>{{ contrib_representante }}</b>
 								</div>
