@@ -106,7 +106,11 @@ try:
     exec(compile(open(local, 'r').read(), local, 'exec'))
 except IOError:
     pass
+import sys
+if 'test' in sys.argv:
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SOUTH_TESTS_MIGRATE=False
