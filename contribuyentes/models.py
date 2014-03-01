@@ -28,15 +28,15 @@ class Contribuyente(models.Model):
     def __unicode__(self):
         return '%d %s %s %s'%(self.id_contrato,self.num_identificacion,self.nombre,self.representante)
 
-    def save(self):
+    def save(self,*args,**kwargs):
         if not self.id_contrato:
             from django.db.models import Max
             self.id_contrato=Contribuyente.objects.all().aggregate(Max('id_contrato'))['id_contrato__max']+1
-            return super(Contribuyente,self).save(self)
-        else:
+        if kwargs.get('force_update'):
             return super(Contribuyente,self).save(update_fields=['num_identificacion', 'nombre', 'telf',
                                                                  'fax', 'email', 'representante',
                                                                  'cedula_rep', 'capital', 'direccion', 'modificado'])
+        return super(Contribuyente,self).save(self)
 
     def licencias(self,):
         return Licencia2.object.filter(contribuyente=self.pk)
