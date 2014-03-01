@@ -67,26 +67,30 @@ class EstimadasField(ModelChoiceField):
 class EstimadasForm(forms.Form):  # [1]
     rubros= EstimadasField(queryset=None, label="Rubros", required=True, empty_label=None)
     tipo='EST'
+    def _calculo(self,estimadas,ano):
+        ut=UT.objects.filter(ano=ano)
+        subtotaldef=0.0
+        if ut.exists():
+            ut=ut[0].valor
+        else:
+            ut=UT.objects.get(ano=ano-1).valor
+        for montos in estimadas:
+            rubro=Rubro.objects.get(codigo=montos)
+            montout=float(rubro.ut)*ut
+            montoali=float(estimadas[montos])*(rubro.alicuota/100)
+            if montout>montoali:
+                subtotaldef+=montout
+            else:
+                subtotaldef+=montoali
+        return subtotaldef
     def procesar(self,wizard,form):
         import datetime
         subtotaldef=0.0
         for ano,rubros in form.cleaned_data['rubros'].iteritems():
             ano=int(ano)
-            ut=UT.objects.filter(ano=ano)
-            if ut.exists():
-                ut=ut[0].valor
-            else:
-                ut=UT.objects.get(ano=ano-1).valor
             definitivas=Monto.objects.filter(contribuyente=wizard.get_all_cleaned_data()['contrib'],ano=ano)
             if definitivas.exists():
-                for montos in rubros:
-                    rubro=Rubro.objects.get(codigo=montos)
-                    montout=float(rubro.ut)*ut
-                    montoali=float(rubros[montos])*(rubro.alicuota/100)
-                    if montout>montoali:
-                        subtotaldef+=montout
-                    else:
-                        subtotaldef+=montoali
+                subtotaldef=self._calculo(rubros,ano)
         return ano,round(subtotaldef,2)
 
 class RubrosForm(forms.Form):  # [1]
