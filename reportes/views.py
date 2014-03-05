@@ -334,3 +334,229 @@ def liquidacion_report(request, liquidacion):
 
     doc.build(elementos)
     return response
+
+
+@login_required(login_url='/login/')
+def boletin_liquid_definitiva(request, liquidacion):
+    liquid = Liquidacion2.objects.get(numero=liquidacion)
+    pagos = Pago2.objects.filter(liquidacion=liquid.pk)
+
+    nombre_reporte = "boletin_liquidacion"
+    response = HttpResponse(mimetype='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename='+nombre_reporte+'.pdf; pagesize=letter;'
+
+    #Esta lista contendra todos los elementos que se dibujaran en el pdf
+    elementos = []
+    doc = SimpleDocTemplate(response, title=nombre_reporte, topMargin=5,
+                            bottomMargin=5, rightMargin=15, leftMargin=15)
+
+    for i in range(0, 2):
+        #---> Encabezado <---
+        styleSheet = getSampleStyleSheet()
+        cabecera = styleSheet['Normal']
+        cabecera.alignment = TA_CENTER
+        cabecera.firstLineIndent = 0
+        cabecera.fontSize = 6
+        cabecera.fontName = 'Helvetica-Bold'
+        cabecera.leftIndent = -380
+        cabecera.leading = 7
+
+        logo = Image(settings.STATIC_ROOT+'/reportes/escudo.jpg',
+                    width=25, height=35)
+        logo.hAlign = 'LEFT'
+        elementos.append(logo)
+
+        elementos.append(Spacer(1, -35))
+        txtEncabezado = 'República Bolivariana de Venezuela'
+        txtEncabezado += '<br />Estado Cojedes'
+        txtEncabezado += '<br />Alcaldía del Municipio San Carlos'
+        txtEncabezado += '<br />Dirección de Rentas Municipales'
+        txtEncabezado += '<br />RIF: G-200003371-1'
+        encabezado = Paragraph(txtEncabezado, cabecera)
+        elementos.append(encabezado)
+        #---> Fin Encabezado <---
+
+        #---> Datos Contribuyente <---
+        styleSheet2 = getSampleStyleSheet()
+        estilo_contrib = styleSheet2['BodyText']
+        estilo_contrib.alignment = TA_CENTER
+        estilo_contrib.fontSize = 7.5
+        estilo_contrib.fontName = 'Times-Roman'
+        estilo_contrib.leading = 6
+        contrib_style = [
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ]
+
+        elementos.append(Spacer(1, -37))
+
+        contrib1 = Paragraph(u'<b>BOLETIN DE NOTIFICACIÓN</b>', estilo_contrib)
+        contrib2 = Paragraph(u'<b>%s</b>' % pagos[0].impuesto.descripcion, estilo_contrib)
+        contrib3 = Paragraph(u'<b>PERIODO IMPOSITIVO:</b> %s ' % (liquid.ano), estilo_contrib)
+        contrib4 = Paragraph(u'<b>FECHA:</b> %s' % liquid.emision, estilo_contrib)
+
+        tabla_contrib = []
+        tabla_contrib.append([contrib1])
+        tabla_contrib.append([contrib2])
+        tabla_contrib.append([contrib3])
+        tabla_contrib.append([contrib4])
+
+        tabla_contrib = Table(tabla_contrib, colWidths=(12.0*cm))
+        tabla_contrib.setStyle(TableStyle(contrib_style))
+        tabla_contrib.hAlign = 'RIGHT'
+
+        elementos.append(tabla_contrib)
+        #---> Fin Datos Contrib <---
+
+        #---> Tabla <---
+        elementos.append(Spacer(1, 10))
+
+        estilo_tabla = styleSheet['BodyText']
+        estilo_tabla.alignment = TA_CENTER
+        estilo_tabla.fontSize = 7.5
+        estilo_tabla.leading = 7
+        x = [
+            ('BACKGROUND', (0, 0), (2, 0), colors.silver),
+            ('BACKGROUND', (0, 2), (2, 2), colors.silver),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.silver),
+            ('GRID', (0, 0), (-1, -1), 0.50, colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('FONT', (0, 0), (-1, -1), "Helvetica", 7.5),
+        ]
+        tabla = []
+
+        # Headers de la tabla
+        hdatos = Paragraph('<b>R.I.F.</b>', estilo_tabla)
+        hdatos1 = Paragraph('<b>RAZON SOCIAL</b>', estilo_tabla)
+        hdatos2 = Paragraph('<b>ID</b>', estilo_tabla)
+
+        hdatos3 = Paragraph('<b>DOMICILIO FISCAL</b>', estilo_tabla)
+        x.append(('SPAN', (0, 2), (2, 2))),  # Extendiendo columna
+
+        hdatos4 = Paragraph('<b>PERIODO FISCAL:</b>', estilo_tabla)
+        hdatos5 = Paragraph('<b>IMPUESTO TOTAL ANUAL ESTIMADO</b>', estilo_tabla)
+        hdatos6 = Paragraph('<b>IMPUESTO TOTAL ANUAL DEFINITIVO</b>', estilo_tabla)
+        hdatos7 = Paragraph('<b>DIFERENCIA A CANCELAR</b>', estilo_tabla)
+        # Fin Headers de la tabla
+
+        tabla.append([hdatos, hdatos1, hdatos2])
+        tabla.append([liquid.contribuyente.num_identificacion, liquid.contribuyente.nombre, liquid.contribuyente.id_contrato])
+
+        # -- Direccion
+        tabla.append([hdatos3])
+        direccion = Paragraph('%s' % liquid.contribuyente.direccion, estilo_tabla)
+        tabla.append([direccion])
+        x.append(('SPAN', (0, 3), (2, 3))),  # Extendiendo columna
+
+        # -- Periodo Fiscal
+        periodo_fiscal = Paragraph('<b>01 DE ENERO DE ## AL 31 DE DICIEMBRE DE %s</b>' % liquid.ano, estilo_tabla)
+        tabla.append([hdatos4, periodo_fiscal])
+        x.append(('SPAN', (1, 4), (2, 4))),  # Extendiendo columna
+
+        t = Table(tabla, colWidths=(3.5*cm, 11.5*cm, 3.5*cm))
+        t.setStyle(TableStyle(x))
+        elementos.append(t)
+        elementos.append(Spacer(1, 10))
+
+        tabl2 = []
+        y = [
+            ('BACKGROUND', (0, 0), (2, 0), colors.silver),
+            ('BOX', (0, 5), (6, 0), 0.50, colors.black),
+            ('BOX', (0, 9), (6, 0), 0.50, colors.black),
+            ('GRID', (0, 0), (-1, -1), 0.50, colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONT', (0, 0), (-1, -1), "Helvetica", 7.5),
+        ]
+        tabl2.append([hdatos5, hdatos6, hdatos7])
+        montos = liquid.contribuyente.monto_set.filter(contribuyente=liquid.contribuyente, ano=liquid.ano)
+        diferencia = float(montos[0].definitivo) - float(montos[0].estimado)
+        tabl2.append([montos[0].estimado, montos[0].definitivo, diferencia])
+
+        t2 = Table(tabl2, colWidths=(6.5*cm, 6.5*cm, 5.5*cm))
+        t2.setStyle(TableStyle(y))
+        elementos.append(t2)
+        #---> Fin Tabla <---
+
+        #---> Notas <---
+        styleSheetNota = getSampleStyleSheet()
+        nota = styleSheetNota['Normal']
+        nota.fontSize = 7.5
+        nota.fontName = 'Helvetica'
+        nota.alignment = TA_JUSTIFY
+
+        elementos.append(Spacer(1, 5))
+        txtNota1 = Paragraph('<b>Ordenanza de Impuesto sobre Actividades Económicas vigente:</b><br />', nota)
+        elementos.append(txtNota1)
+
+        txtArt1 = Paragraph('"<b>ARTICULO 24.-</b> La declaración definitiva deberá presentarse en el mes de Enero de cada año y comprenderá'+\
+                            ' el monto de los ingresos brutos obtenidos en el ejercicio económico entre el 1° de Enero al 31 de Diciembre'+\
+                            ' del año anterior, en cada una de las actividades o ramo ejercidas por el contribuyente a que se refiere el'+\
+                            ' Clasificador de Actividades Económicas y que hayan sido o no autorizados en la correspondiente Licencia'+\
+                            ', la cual conformara la base imponible definitiva para la determinación, cálculo y liquidación del impuesto'+\
+                            ' correspondiente a la obligación tributaria causada en el ejercicio fiscal fenecido."<br />', nota)
+        elementos.append(txtArt1)
+
+        elementos.append(Spacer(1, 5))
+        txtArt2 = Paragraph('"<b>ARTICULO 66.-</b> Serán sancionados en la forma prevista en el artículo de los contribuyentes que:'+\
+                            ' ..."d) No paguen, dentro de los plazos previstos en el artículo 24 de esta Ordenanza, la diferencia'+\
+                            ' producto de la presentación de la declaración definitiva, con <b>multa equivalente a 10 Unidades'+\
+                            ' Tributarias y cierre temporal del establecimiento</b>, hasta tanto cumpla con las obligaciones'+\
+                            ' establecidas en dicho artículo."<br />', nota)
+        elementos.append(txtArt2)
+
+        elementos.append(Spacer(1, 5))
+        txtNota2 = Paragraph('NOTA: La presente notificación no implica la<br />cancelación de años anteriores al %s' % liquid.ano, nota)
+        elementos.append(txtNota2)
+
+        elementos.append(Spacer(1, 10))
+        styleSheet3 = getSampleStyleSheet()
+        parrafo = styleSheet3['Normal']
+        parrafo.fontSize = 7.5
+        parrafo.fontName = 'Helvetica'
+        parrafo.alignment = TA_CENTER
+
+        elementos.append(Spacer(1, 15))
+        txtNota3 = Paragraph('<b>Evite Sanciones... Cumpla con su Ciudad...!<br />SAN CARLOS SOMOS TODOS..!</b>', parrafo)
+        elementos.append(txtNota3)
+
+        styleSheet3 = getSampleStyleSheet()
+        parrafo = styleSheet3['Normal']
+        parrafo.fontSize = 7.5
+        parrafo.rightIndent = -320
+        parrafo.fontName = 'Helvetica'
+        parrafo.alignment = TA_CENTER
+
+        elementos.append(Spacer(1, -50))
+        lineaStyle = [
+            ('LINEABOVE', (0, 0), (-1, -1), 0.55, colors.black),
+            ('FONT', (0, 0), (-1, -1), "Helvetica", 2),
+        ]
+        linea = []
+        linea.append([' '])
+
+        l2 = Table(linea, colWidths=(8.0*cm))
+        l2.setStyle(TableStyle(lineaStyle))
+        l2.hAlign = 'RIGHT'
+        elementos.append(l2)
+
+        elementos.append(Spacer(1, -15))
+        txtNota4 = Paragraph('<hr /><br />ING. Glendys Quiñones' +
+                             '<br /><b>Directora</b>', parrafo)
+        elementos.append(txtNota4)
+
+        elementos.append(Spacer(1, 20))
+        txtNota4 = Paragraph('<b>ALCALDIA</b>', parrafo)
+        elementos.append(txtNota4)
+        #---> Fin Notas <---
+
+        elementos.append(Spacer(1, 10))
+        linea = []
+        linea.append([' '])
+
+        l2 = Table(linea, colWidths=(20.0*cm))
+        l2.setStyle(TableStyle(lineaStyle))
+        elementos.append(l2)
+
+    doc.build(elementos)
+    return response
