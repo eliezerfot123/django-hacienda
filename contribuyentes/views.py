@@ -15,6 +15,8 @@ from django.views.generic.edit import CreateView, UpdateView
 from contribuyentes.models import Contribuyente,Credito
 from django.db import transaction
 import datetime
+from django.core.urlresolvers import reverse
+
 
 class ContribuyenteCrear(CreateView):
     model=Contribuyente
@@ -130,6 +132,18 @@ class LiquidacionWizard(SessionWizardView):
                     Monto.objects.get_or_create(contribuyente=contribuyente,rubro=rubro,estimado=form.cleaned_data['estimado'][ano][rubroid],ano=ano)
         return self.get_form_step_data(form)
 
+    def render_next_step(self, form, **kwargs):
+        if self.steps.current == '1':
+            if self.get_cleaned_data_for_step('1')['tipo_liquidacion'] == 'est':
+                filter_liquid = Liquidacion2.objects.filter(ano=datetime.datetime.today().year, contribuyente=self.get_cleaned_data_for_step('0')['contrib'].id, pago2__impuesto=self.get_cleaned_data_for_step('0')['impuesto'].id)
+                """Validación para comprobar si ya se a creado la estimada"""
+                if filter_liquid:
+                    from django.contrib import messages
+                    messages.error(self.request, "%s en el año %s" % (self.get_cleaned_data_for_step('0')['impuesto'], datetime.datetime.today().year))
+                    return HttpResponseRedirect(reverse('contrib-liquids', args=[self.get_cleaned_data_for_step('0')['contrib'].id]))
+        return super(LiquidacionWizard, self).render_next_step(form, **kwargs)
+
+
     @transaction.atomic
     def done(self, form_list, **kwargs):
         #do_something_with_the_form_data(form_list)
@@ -139,8 +153,18 @@ class LiquidacionWizard(SessionWizardView):
             if 'tipo' in dir(formu):
                 tipo=formu.tipo
                 break
-        liquidacion=Liquidacion2(ano=self.get_all_cleaned_data()['trimestre'].values()[0].keys()[0],deposito=self.get_all_cleaned_data()['numero'],emision=datetime.date.today(),contribuyente=self.get_all_cleaned_data()['contrib'],vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),observaciones=self.get_all_cleaned_data()['observaciones'],liquidador=self.request.user,tipo=tipo)
+        liquidacion=Liquidacion2(ano=self.get_all_cleaned_data()['trimestre'].values()[0].keys()[0],
+        deposito=self.get_all_cleaned_data()['numero'],
+        emision=datetime.date.today(),
+        contribuyente=self.get_all_cleaned_data()['contrib'],
+        vencimiento= datetime.date(datetime.date.today().year,
+        datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),
+        observaciones=self.get_all_cleaned_data()['observaciones'],
+        liquidador=self.request.user,tipo=tipo),
+        modopago=self.get_all_cleaned_data()['modopago'])
+
         liquidacion.save()
+
         for ano,rubros in self.get_all_cleaned_data()['rubros'].iteritems():
             monto=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano,definitivo=None)
             for montos in rubros:
@@ -168,10 +192,8 @@ class LiquidacionWizard(SessionWizardView):
             pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'],ut=ut,credito_fiscal=pagos['credito'])
             pago.save()
 
-        return HttpResponseRedirect("/reporte/liquidacion/%s/" % liquidacion.numero)
-
-        return render(self.request, 'crear_pago.html', {
-            'form_data': [form.cleaned_data for form in form_list],
+        return render(self.request, 'liquid_cargada.html', {
+            'liquid_numero': liquidacion.numero, 'tipo_liquid': self.get_cleaned_data_for_step('1')['tipo_liquidacion'],
         })
 
 

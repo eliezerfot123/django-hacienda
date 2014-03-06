@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.views import login
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
+from django.http import HttpResponseRedirect
+
 
 @csrf_protect
 def home(request):
@@ -16,13 +18,15 @@ def home(request):
                 login(request, user)
                 c = {}
                 c.update(csrf(request))
-                c.update({'usuario':user.get_username()})
-                return render(request, 'lista_contribuyentes.html', c)
+                if request.REQUEST.get('next'):
+                    return HttpResponseRedirect(request.REQUEST.get('next'))
+                else:
+                    return render(request, 'lista_contribuyentes.html', c)
             else:
                 c = {}
                 c.update(csrf(request))
-                c.update({'no_active':'Usuario inactivo'})
+                c.update({'no_active': 'Usuario inactivo'})
                 return render_to_response('login/index.html', c)
         else:
-            return login(request,template_name='login/index.html')
+            return login(request, template_name='login/index.html')
     return login(request, template_name='login/index.html')
