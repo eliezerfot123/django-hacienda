@@ -5,7 +5,7 @@ from django.template.context import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from liquidaciones.models import Pago, Liquidacion,Impuesto,Liquidacion2,Pago2,UT
+from liquidaciones.models import Pago, Liquidacion,Impuesto,Liquidacion2,Pago2,UT,Cuota
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 import json
@@ -118,7 +118,14 @@ class LiquidacionWizard(SessionWizardView):
         import calendar
         import datetime
         datos=self.get_all_cleaned_data()
-        liquidacion=Liquidacion2(ano=datos['trimestre'].values()[0].keys()[0],deposito=datos['numero'],emision=datetime.date.today(),contribuyente=datos['contrib'],vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),observaciones=datos['observaciones'],liquidador=self.request.user,tipo=datos['tipo'])
+        tipo='SND'
+        for formu in form_list:
+            if 'tipo' in dir(formu):
+                tipo=formu.tipo
+                break
+
+
+        liquidacion=Liquidacion2(ano=datos['trimestre'].values()[0].keys()[0],deposito=datos['numero'],emision=datetime.date.today(),contribuyente=datos['contrib'],vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),observaciones=datos['observaciones'],liquidador=self.request.user)
         liquidacion.save()
         for ano,rubros in self.get_all_cleaned_data()['rubros'].iteritems():
             monto=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano,definitivo=None)
@@ -129,7 +136,7 @@ class LiquidacionWizard(SessionWizardView):
                     definitiva.definitivo=rubros[montos]
                     definitiva.save()
 
-        for impuesto,pagos in form_list[2].cleaned_data['trimestre'].iteritems():
+        for impuesto,pagos in self.get_all_cleaned_data()['trimestre'].iteritems():
             ut=UT.objects.filter(ano=datetime.date.today().year-1)[0]
             pagos=pagos.values()[0]
             if float(pagos['monto'])<0:
@@ -138,14 +145,20 @@ class LiquidacionWizard(SessionWizardView):
                 credito=0.0
 
                 """ Busca de credito fiscal """
-            credit,creado=Credito.objects.get_or_create(contribuyente=self.get_all_cleaned_data()['contrib'])
+            impuesto=Impuesto.objects.get(codigo=impuesto)
+            credit,creado=Credito.objects.get_or_create(contribuyente=self.get_all_cleaned_data()['contrib'],impuesto=impuesto)
             credit.monto=credito
             credit.save()
-            if liquidacion.tipo=='DEF':
+            if tipo=='DEF':
                 credito=0.0
 
-            pago=Pago2(liquidacion=liquidacion,impuesto=Impuesto.objects.get(codigo=impuesto),descuento=pagos['descuento'],trimestres=pagos['trimestres'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'],ut=ut,credito_fiscal=pagos['credito'])
+            pago=Pago2(liquidacion=liquidacion,impuesto=impuesto,descuento=pagos['descuento'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'],ut=ut,credito_fiscal=pagos['credito'],tipo=tipo)
             pago.save()
+            
+            for trimestres in range(1,int(pagos['trimestres'])+1):
+               cuota=Cuota.objects.get(orden=trimestres,tipo='TRIM')
+               pago.trimestres.add(cuota)
+                
 
         return HttpResponseRedirect("/reporte/liquidacion/%s/" % liquidacion.numero)
 
