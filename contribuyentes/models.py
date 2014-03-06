@@ -55,7 +55,7 @@ class Credito(models.Model):
 class Monto(models.Model):
     contribuyente=models.ForeignKey(Contribuyente)
     estimado=models.FloatField()
-    definitivo=models.FloatField(null=True)
+    definitivo=models.FloatField(null=True, blank=True)
     ano=models.IntegerField()
     rubro=models.ForeignKey(Rubro)
 

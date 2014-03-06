@@ -1,0 +1,225 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<title>Crear Liquidación .::Hacienda::.</title>
+
+		<meta name="description" content="Static &amp; Dynamic Tables" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<link rel="shortcut icon" href="{% static "assets/img/favicon.png" %}">
+		<!--basic styles-->
+		<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet" />
+		<link href="{% static "assets/css/bootstrap-responsive.min.css" %}" rel="stylesheet" />
+		<link rel="stylesheet" href="{% static "assets/css/font-awesome.min.css" %}" />
+
+		<!--[if IE 7]>
+		  <link rel="stylesheet" href="{% static "assets/css/font-awesome-ie7.min.css" %}" />
+		<![endif]-->
+
+		<!--page specific plugin styles-->
+
+		<link rel="stylesheet" href="{% static "assets/css/jquery-ui-1.10.3.custom.min.css" %}" />
+		<link rel="stylesheet" href="{% static "assets/css/chosen.css" %}" />
+		<link rel="stylesheet" href="{% static "assets/css/datepicker.css" %}" />
+		<link rel="stylesheet" href="{% static "assets/css/bootstrap-timepicker.css" %}" />
+		<link rel="stylesheet" href="{% static "assets/css/daterangepicker.css" %}" />
+
+		<!--fonts-->
+
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300" />
+
+		<!--ace styles-->
+
+		<link rel="stylesheet" href="{% static "assets/css/ace.min.css" %}" />
+		<link rel="stylesheet" href="{% static "assets/css/ace-responsive.min.css" %}" />
+		<link rel="stylesheet" href="{% static "assets/css/ace-skins.min.css" %}" />
+
+		<!--[if lte IE 8]> 	
+		  <link rel="stylesheet" href="{% static "assets/css/ace-ie.min.css" %}" />
+		<![endif]-->
+
+		<!--inline styles related to this page-->
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
+
+	<body>
+		<div class="navbar">
+			<div class="navbar-inner">
+				<div class="container-fluid">
+					<a href="#" class="brand">
+						<small>
+							<b>Sistema de Recaudación</b>
+						</small>
+					</a><!--/.brand-->
+
+					<ul class="nav ace-nav pull-right">
+
+						<li class="light-blue">
+							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
+								<img class="nav-user-photo" src="{% static "assets/avatars/avatar2.png" %}" alt="{{user.get_username}}" />
+								<span class="user-info">
+									<small>Bienvenido,</small>
+									{{ user.get_username }}
+								</span>
+
+								<i class="icon-caret-down"></i>
+							</a>
+
+							<ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-closer">
+								<li>
+									<a href="#">
+										<i class="icon-cog"></i>
+										Configuración
+									</a>
+								</li>
+
+								<li>
+									<a href="#">
+										<i class="icon-user"></i>
+										Perfil
+									</a>
+								</li>
+
+								<li class="divider"></li>
+
+								<li>
+									<a href="/login/logout/">
+										<i class="icon-off"></i>
+										Salir
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul><!--/.ace-nav-->
+				</div><!--/.container-fluid-->
+			</div><!--/.navbar-inner-->
+		</div>
+
+		<div class="main-container container-fluid">
+			<a class="menu-toggler" id="menu-toggler" href="#">
+				<span class="menu-text"></span>
+			</a>
+
+			<div class="sidebar" id="sidebar">
+				<div class="sidebar-shortcuts" id="sidebar-shortcuts">
+					<div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+						<button class="btn btn-small btn-success">
+							<i class="icon-signal"></i>
+						</button>
+
+						<button class="btn btn-small btn-info">
+							<i class="icon-pencil"></i>
+						</button>
+
+						<button class="btn btn-small btn-warning">
+							<i class="icon-group"></i>
+						</button>
+
+						<button class="btn btn-small btn-danger">
+							<i class="icon-cogs"></i>
+						</button>
+					</div>
+
+					<div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+						<span class="btn btn-success"></span>
+
+						<span class="btn btn-info"></span>
+
+						<span class="btn btn-warning"></span>
+
+						<span class="btn btn-danger"></span>
+					</div>
+				</div><!--#sidebar-shortcuts-->
+                {% include 'navbar.html'%}
+
+				<div class="sidebar-collapse" id="sidebar-collapse">
+					<i class="icon-double-angle-left"></i>
+				</div>
+			</div>
+
+			<div class="main-content">
+				<div class="breadcrumbs" id="breadcrumbs">
+					<ul class="breadcrumb">
+						<li>
+							<i class="icon-home home-icon"></i>
+							<a href="#">Inicio</a>
+
+							<span class="divider">
+								<i class="icon-angle-right arrow-icon"></i>
+							</span>
+						</li>
+						<li class="active">Liquidación</li>
+					</ul><!--.breadcrumb-->
+				</div>
+
+				<div class="page-content">
+					<div class="page-header position-relative">
+						<h1>
+							Liquidaciones
+							<small>
+								<i class="icon-double-angle-right"></i>
+								Cargar liquidaciones
+							</small>
+						</h1>
+					</div><!--/.page-header-->
+
+						<div class="span12">
+							<!--PAGE CONTENT BEGINS-->
+							<div class="row-fluid">
+								<h3 class="header smaller lighter green">Liquidación Cargada Exitosamente</h3>
+
+								<div id="fuelux-wizard" class="row-fluid hide" data-target="#step-container">
+									<ul class="wizard-steps">
+										<li data-target="#step1" class="active">
+											<span class="step">1</span>
+											<span class="title">Impuestos</span>
+										</li>
+
+										<li data-target="#step2">
+											<span class="step">2</span>
+											<span class="title">Rubros</span>
+										</li>
+
+										<li data-target="#step3">
+											<span class="step">3</span>
+											<span class="title">Liquidación</span>
+										</li>
+
+										<li data-target="#step4" class="active">
+											<span class="step">4</span>
+											<span class="title">Imprimir Liquidación</span>
+										</li>
+									</ul>
+								</div>
+
+
+								<a href="/reporte/liquidacion/{{ liquid_numero }}" class="btn btn-app btn-info btn-small no-radius" style="width:100px;">
+										<i class="icon-print bigger-200"></i>
+										Imprimir Liquidación
+								</a>
+
+								{% if tipo_liquid == 'def' %}
+									<a href="/reporte/boletin_def/{{ liquid_numero }}" class="btn btn-app btn-light btn-small no-radius" style="width:100px;">
+											<i class="icon-envelope bigger-200"></i>
+											Imprimir Boletín
+									</a>
+								{% else %}
+									<a href="/reporte/boletin_est/{{ liquid_numero }}" class="btn btn-app btn-light btn-small no-radius" style="width:100px;">
+											<i class="icon-envelope bigger-200"></i>
+											Imprimir Boletín
+									</a>
+								{% endif %}
+								<hr></hr>
+								
+								<button class="btn btn-mini btn-success">
+									Cargar Nueva Liquidación
+									<i class="icon-arrow-right  icon-on-right"></i>
+								</button>
+
+							</div><!--/.row-fluid-->
+						</div><!--/.span-->
+					</div><!--/.row-fluid-->
+				</div><!--/.page-content-->
+			</div><!--/.main-content-->
+		</div><!--/.main-container-->

@@ -54,10 +54,10 @@
 
 						<li class="light-blue">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
-								<img class="nav-user-photo" src="{% static "assets/avatars/avatar2.png" %}" alt="{{usuario}}" />
+								<img class="nav-user-photo" src="{% static "assets/avatars/avatar2.png" %}" alt="{{user.get_username}}" />
 								<span class="user-info">
 									<small>Bienvenido,</small>
-									{{usuario}}
+									{{user.get_username}}
 								</span>
 
 								<i class="icon-caret-down"></i>

@@ -14,6 +14,8 @@ from contribuyentes.forms import ImpuestosForm, RubrosForm, LiquidacionForm,Cont
 from django.views.generic.edit import CreateView, UpdateView
 from contribuyentes.models import Contribuyente,Credito
 from django.db import transaction
+import datetime
+from django.core.urlresolvers import reverse
 
 
 class ContribuyenteCrear(CreateView):
@@ -46,17 +48,19 @@ def actividad_eco(wizard):
         return wizard.get_cleaned_data_for_step('0')['impuesto'].codigo==301020700
 def definitiva(wizard):
     if wizard.get_cleaned_data_for_step('1'):
-        print wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')
         return wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')=='def'
+
+def crear_estimada(wizard):
+    if wizard.get_cleaned_data_for_step('0'):
+        return  not Monto.objects.filter(contribuyente=wizard.get_cleaned_data_for_step('0')['contrib'],ano=datetime.date.today().year).exclude(estimado=None).exists() or wizard.get_cleaned_data_for_step('2')
+
+
 
 def estimada(wizard):
     if wizard.get_cleaned_data_for_step('1'):
-        print wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')
-
         return wizard.get_cleaned_data_for_step('1').get('tipo_liquidacion')=='est'
 
 class LiquidacionWizard(SessionWizardView):
-    form_list = [ImpuestosForm, RubrosForm, LiquidacionForm]
     template_name = 'crear_pago.html'
     contrib=None
     impuesto=None
@@ -65,24 +69,35 @@ class LiquidacionWizard(SessionWizardView):
 
     def get_form(self, step=None, data=None, files=None):
         formu = super(LiquidacionWizard, self).get_form(step, data, files)
-
         if step is None:
             step = self.steps.current
-        
-        if formu.fields.get('rubros') :
-            formu.fields['rubros'].queryset = Monto.objects.filter(contribuyente=self.get_cleaned_data_for_step('0')['contrib'])
+        if step == '2' and 'estimado' in formu.fields :
+            contribuyente=self.get_cleaned_data_for_step('0')['contrib']
+            if not Monto.objects.filter(contribuyente=contribuyente,ano=datetime.date.today().year).exclude(estimado=None).exists():
+                formu.fields['estimado'].queryset=contribuyente.rubro.all()
 
-        elif formu.fields.get('trimestre') :
+            else:
+                step='4'
+                formu = super(LiquidacionWizard, self).get_form(step, data, files)
+        if 'rubros' in formu.fields:
+            formu = super(LiquidacionWizard, self).get_form(step, data, files)
+            contribuyente=self.get_cleaned_data_for_step('0')['contrib']
+            formu = super(LiquidacionWizard, self).get_form(step, data, files)
+            formu.fields['rubros'].queryset = Monto.objects.filter(contribuyente=contribuyente)
+
+        elif 'trimestre' in formu.fields :
             formu.fields['trimestre'].choices=[self.montos]
 
+        print step;
         return formu
 
+    @transaction.atomic
     def process_step(self, form):
         import datetime
         if self.steps.current == '0':
             self.impuesto = form.cleaned_data['impuesto']
             self.query = Monto.objects.filter(contribuyente=form.cleaned_data['contrib'])
-        if 'procesar' in dir(form): 
+        if 'procesar' in dir(form):
             subtotaldef=0.0
             subtotalest=0.0
             if form.is_valid():
@@ -109,8 +124,25 @@ class LiquidacionWizard(SessionWizardView):
                 self.montos = dict({'impuesto':self.get_cleaned_data_for_step('0')['impuesto'],'montos':{ano:subtotaldef},'contribuyente':self.get_cleaned_data_for_step('0')['contrib']})
             else:
                 formu.fields['rubros'].queryset = self.query
-
+        elif 'estimado' in form.cleaned_data:
+            contribuyente=self.get_cleaned_data_for_step('0')['contrib']
+            for ano in form.cleaned_data['estimado']:
+                for rubroid in form.cleaned_data['estimado'][ano]:
+                    rubro=Rubro.objects.get(codigo=rubroid)
+                    Monto.objects.get_or_create(contribuyente=contribuyente,rubro=rubro,estimado=form.cleaned_data['estimado'][ano][rubroid],ano=ano)
         return self.get_form_step_data(form)
+
+    def render_next_step(self, form, **kwargs):
+        if self.steps.current == '1':
+            if self.get_cleaned_data_for_step('1')['tipo_liquidacion'] == 'est':
+                filter_liquid = Liquidacion2.objects.filter(ano=datetime.datetime.today().year, contribuyente=self.get_cleaned_data_for_step('0')['contrib'].id, pago2__impuesto=self.get_cleaned_data_for_step('0')['impuesto'].id)
+                """Validación para comprobar si ya se a creado la estimada"""
+                if filter_liquid:
+                    from django.contrib import messages
+                    messages.error(self.request, "%s en el año %s" % (self.get_cleaned_data_for_step('0')['impuesto'], datetime.datetime.today().year))
+                    return HttpResponseRedirect(reverse('contrib-liquids', args=[self.get_cleaned_data_for_step('0')['contrib'].id]))
+        return super(LiquidacionWizard, self).render_next_step(form, **kwargs)
+
 
     @transaction.atomic
     def done(self, form_list, **kwargs):
@@ -125,8 +157,17 @@ class LiquidacionWizard(SessionWizardView):
                 break
 
 
-        liquidacion=Liquidacion2(ano=datos['trimestre'].values()[0].keys()[0],deposito=datos['numero'],emision=datetime.date.today(),contribuyente=datos['contrib'],vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),observaciones=datos['observaciones'],liquidador=self.request.user)
+        liquidacion=Liquidacion2(ano=datos['trimestre'].values()[0].keys()[0],
+        deposito=datos['deposito'],
+        emision=datetime.date.today(),
+        contribuyente=datos['contrib'],
+        vencimiento= datetime.date(datetime.date.today().year,datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),
+        observaciones=datos['observaciones'],
+        modopago=self.get_all_cleaned_data()['modopago'],
+        liquidador=self.request.user)
+
         liquidacion.save()
+
         for ano,rubros in self.get_all_cleaned_data()['rubros'].iteritems():
             monto=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano,definitivo=None)
             for montos in rubros:
@@ -160,10 +201,8 @@ class LiquidacionWizard(SessionWizardView):
                pago.trimestres.add(cuota)
                 
 
-        return HttpResponseRedirect("/reporte/liquidacion/%s/" % liquidacion.numero)
-
-        return render(self.request, 'crear_pago.html', {
-            'form_data': [form.cleaned_data for form in form_list],
+        return render(self.request, 'liquid_cargada.html', {
+            'liquid_numero': liquidacion.numero, 'tipo_liquid': self.get_cleaned_data_for_step('1')['tipo_liquidacion'],
         })
 
 

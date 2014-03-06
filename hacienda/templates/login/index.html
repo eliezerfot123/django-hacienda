@@ -82,7 +82,13 @@
 												</div>
 												{% endif %}
 
-												<form role="form" method="post" id="login-form" action="/login/" />{% csrf_token %}
+												<!-- Formulario de Login -->
+												{% if next %}
+													<form role="form" method="post" action="/login/?next={{next}}" >
+												{%else%}
+													<form role="form" method="post" action="/login/" >
+												{% endif %}
+													{% csrf_token %}
 													<fieldset>
 														<label>
 															<span class="block input-icon input-icon-right">

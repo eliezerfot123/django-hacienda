@@ -50,7 +50,7 @@ class Liquidacion2(models.Model):
     numero=models.CharField(max_length=20)
     ano=models.IntegerField()
     deposito=models.CharField(max_length=20)
-    modopago=models.CharField(max_length=2,choices=(('CH','Cheque'),('DP','Deposito')),default='DP')
+    modopago=models.CharField(max_length=2,choices=(('CH','Cheque'),('DP','Deposito'),('TF','Transferencia')),default='DP')
     fecha_pago=models.DateField(null=True)
     emision=models.DateField()
     liquidador=models.ForeignKey(User)
@@ -62,7 +62,7 @@ class Liquidacion2(models.Model):
         if not self.id:
             self.numero='10000%03d%d'%(self.liquidador.id,Liquidacion2.objects.filter(liquidador=self.liquidador).count()+1)
         super(Liquidacion2,self).save()
-    
+
     def as_dict(self):
         return {
             "name": "%s  Nro.:%s"%( self.numero,self.deposito),
@@ -84,7 +84,8 @@ class Pago2(models.Model):
     cancelado=models.FloatField() # ToTal
     credito_fiscal=models.FloatField(null=True,default=0.0)
     tipo=models.CharField(max_length=3,choices=(('EST','Estimada'),('DEF','Definitiva'),('SND','Sin Definir')), default='SND')
-    impuesto=models.ForeignKey(Impuesto)
+    def __unicode__(self):
+        return '%s'%self.cancelado
 
 
 

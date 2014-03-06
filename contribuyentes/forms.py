@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from django import forms
 from django.http import HttpResponseRedirect
-from liquidaciones.models import Pago, Liquidacion, Impuesto, UT
+from liquidaciones.models import Pago, Liquidacion2, Impuesto, UT
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.forms import ModelForm, TextInput, Textarea,Select,DateInput
@@ -9,7 +9,7 @@ from django.forms import ModelForm, TextInput, Textarea,Select,DateInput
 from django.forms.models import ModelChoiceField
 
 from contribuyentes.models import Rubro, Contribuyente,Monto
-from liquidaciones.widgets import RubrosWidget,TrimestresWidget,EstimadasWidget
+from liquidaciones.widgets import RubrosWidget, TrimestresWidget, EstimadasWidget, AgregarEstimadoWidget
 import datetime
 
 
@@ -157,10 +157,44 @@ class TrimestresField(ModelChoiceField):
         return  values
 
 
+class AgregarEstimadoField(ModelChoiceField):
+    widget = AgregarEstimadoWidget
+
+    def clean(self, values, initial=None):
+        return values
+
+
+class AgregarEstimadoForm(forms.Form):  # [1] Opcional sino tiene estimada.
+    estimado = AgregarEstimadoField(queryset=None, required=True, label='Añadir Nuevos Estimados')
+
+
 class LiquidacionForm(forms.Form):  # [2]
     trimestre = TrimestresField(queryset=None,required=True,label="")
-    numero = forms.CharField(label="Nro. Deposito/Cheque")
-    observaciones = forms.CharField(widget=forms.Textarea)
+    deposito = forms.CharField(label="Nro. Vauche", max_length="20", required=True)
+    choices_modopago = (('CH','Cheque'),('DP','Deposito'),('TF','Transferencia'))
+    modopago = forms.ChoiceField(choices=choices_modopago, required=True, label="Tipo de Pago")
+    observaciones = forms.CharField(widget=forms.Textarea, required=True)
+
+    deposito.widget.attrs['class'] = 'span6'
+    deposito.widget.attrs['placeholder'] = 'Ingrese Número de Cheque'
+    deposito.widget.attrs['autocomplete'] = 'off'
+    deposito.widget.attrs['required'] = 'required'
+    observaciones.widget.attrs['class'] = 'autosize-transition span6'
+    observaciones.widget.attrs['style'] = 'height:60px;'
+    observaciones.widget.attrs['placeholder'] = 'Observaciones de la liquidación'
+    observaciones.widget.attrs['required'] = 'required'
+
+    def clean_deposito(self):
+        if self.cleaned_data['deposito'] == '':
+            raise forms.ValidationError("Debe colocar el numero del vauche.")
+        else:
+            return self.cleaned_data['deposito']
+
+    def clean_observaciones(self):
+        if self.cleaned_data['observaciones'] == '':
+            raise forms.ValidationError("Debe colocar una(as) observacion(es).")
+        else:
+            return self.cleaned_data['observaciones']
 
 
 class EditarContribuyenteForm(forms.ModelForm):

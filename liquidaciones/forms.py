@@ -20,5 +20,3 @@ class PagoForm(forms.Form):
     def clean_fecha(self):
         fecha=self.cleaned_data['fecha'].split('-')
         return fecha[2]+'-'+fecha[1]+'-'+fecha[0]
-        
-

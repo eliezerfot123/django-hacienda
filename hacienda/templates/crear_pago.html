@@ -3,7 +3,7 @@
 <html lang="es">
 	<head>
 		<meta charset="utf-8" />
-		<title>Buscar Contribuyentes .::Hacienda::.</title>
+		<title>Crear Liquidación .::Hacienda::.</title>
 
 		<meta name="description" content="Static &amp; Dynamic Tables" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -57,10 +57,10 @@
 
 						<li class="light-blue">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
-								<img class="nav-user-photo" src="{% static "assets/avatars/avatar2.png" %}" alt="{{usuario}}" />
+								<img class="nav-user-photo" src="{% static "assets/avatars/avatar2.png" %}" alt="{{user.get_username}}" />
 								<span class="user-info">
 									<small>Bienvenido,</small>
-									{{usuario}}
+									{{ user.get_username }}
 								</span>
 
 								<i class="icon-caret-down"></i>
@@ -315,11 +315,7 @@
 		<!--[if !IE]>-->
 
 		<script src="{% static 'assets/js/jquery-2.0.3.min.js' %}"></script>
-                                        {% if wizard.steps.current == '2' %}
-                                            <script src="{% static 'assets/js/calculos.js' %}" ></script>
-
-                                        {% endif %}
-
+    	<script src="{% static 'assets/js/calculos.js' %}" ></script>
 		<!--<![endif]-->
 
 		<!--[if IE]>
