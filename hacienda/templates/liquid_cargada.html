@@ -199,10 +199,17 @@
 										Imprimir Liquidación
 								</a>
 
-								<a href="/reporte/boletin/{{ liquid_numero }}" class="btn btn-app btn-light btn-small no-radius" style="width:100px;">
-										<i class="icon-envelope bigger-200"></i>
-										Imprimir Boletín
-								</a>
+								{% if tipo_liquid == 'def' %}
+									<a href="/reporte/boletin_def/{{ liquid_numero }}" class="btn btn-app btn-light btn-small no-radius" style="width:100px;">
+											<i class="icon-envelope bigger-200"></i>
+											Imprimir Boletín
+									</a>
+								{% else %}
+									<a href="/reporte/boletin_est/{{ liquid_numero }}" class="btn btn-app btn-light btn-small no-radius" style="width:100px;">
+											<i class="icon-envelope bigger-200"></i>
+											Imprimir Boletín
+									</a>
+								{% endif %}
 								<hr></hr>
 								
 								<button class="btn btn-mini btn-success">

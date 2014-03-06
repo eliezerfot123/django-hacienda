@@ -176,7 +176,7 @@ class LiquidacionWizard(SessionWizardView):
             pago.save()
 
         return render(self.request, 'liquid_cargada.html', {
-            'liquid_numero': liquidacion.numero,
+            'liquid_numero': liquidacion.numero, 'tipo_liquid': self.get_cleaned_data_for_step('1')['tipo_liquidacion'],
         })
 
 

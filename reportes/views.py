@@ -726,6 +726,7 @@ def boletin_liquid_estimada(request, liquidacion):
         tDatos4 = Paragraph('<b>EXIGIBILIDAD</b>', estilo_tabla)
         tDatos5 = Paragraph('<b>RECARGO(10%)</b><br />Si Cancela en...', estilo_tabla)
         tDatos6 = Paragraph('<b>INTERESES ACUMULADOS</b><br />Si Cancela a partir de...', estilo_tabla)
+        nota_especial = Paragraph('Se sumara 1% Adicional Mensual por Adelantado', estilo_tabla)
 
         tabl3.append([titulo_tabl3])
         z.append(('SPAN', (0, 0), (7, 0))),  # Extendiendo columna titulo_tabl3
@@ -738,10 +739,12 @@ def boletin_liquid_estimada(request, liquidacion):
         monto_estimado = montos[0].estimado
         monto_trimestres = float(monto_estimado) / 4
         monto_recargo = float(monto_trimestres) * 0.10
-        tabl3.append(['1', liquid.ano, monto_trimestres, 'ENERO', 'FEBRERO', monto_recargo, 'MARZO', ''])
+        tabl3.append(['1', liquid.ano, monto_trimestres, 'ENERO', 'FEBRERO', monto_recargo, 'MARZO', nota_especial])
         tabl3.append(['2', liquid.ano, monto_trimestres, 'ABRIL', 'MAYO', monto_recargo, 'JUNIO', ''])
         tabl3.append(['3', liquid.ano, monto_trimestres, 'JULIO', 'AGOSTO', monto_recargo, 'SEPTIEMBRE', ''])
         tabl3.append(['4', liquid.ano, monto_trimestres, 'OCTUBRE', 'NOVIEMBRE', monto_recargo, 'DICIEMBRE', ''])
+        z.append(('SPAN', (7, 2), (7, 5))),  # Extendiendo columna nota_especial
+        z.append(('VALIGN', (7, 2), (7, 5), 'MIDDLE')),
 
         nota_est = Paragraph('<b>SI CANCELA TODO ANTES DEL 31 DE ENERO DEL AÑO EN CURSO TENDRA<br />UN DESCUENTO DEL 10% DEL MONTO DE SUS IMPUESTOS</b>', estilo_tabla)
         tabl3.append([nota_est])
