@@ -54,7 +54,7 @@ def crear_estimada(wizard):
     if wizard.get_cleaned_data_for_step('0'):
         return  not Monto.objects.filter(contribuyente=wizard.get_cleaned_data_for_step('0')['contrib'],ano=datetime.date.today().year).exclude(estimado=None).exists() or wizard.get_cleaned_data_for_step('2')
 
-    
+
 
 def estimada(wizard):
     if wizard.get_cleaned_data_for_step('1'):
@@ -97,7 +97,7 @@ class LiquidacionWizard(SessionWizardView):
         if self.steps.current == '0':
             self.impuesto = form.cleaned_data['impuesto']
             self.query = Monto.objects.filter(contribuyente=form.cleaned_data['contrib'])
-        if 'procesar' in dir(form): 
+        if 'procesar' in dir(form):
             subtotaldef=0.0
             subtotalest=0.0
             if form.is_valid():
@@ -154,7 +154,7 @@ class LiquidacionWizard(SessionWizardView):
                 tipo=formu.tipo
                 break
         liquidacion=Liquidacion2(ano=self.get_all_cleaned_data()['trimestre'].values()[0].keys()[0],
-        deposito=self.get_all_cleaned_data()['numero'],
+        deposito=self.get_all_cleaned_data()['deposito'],
         emision=datetime.date.today(),
         contribuyente=self.get_all_cleaned_data()['contrib'],
         vencimiento= datetime.date(datetime.date.today().year,

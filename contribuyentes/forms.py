@@ -181,16 +181,16 @@ class LiquidacionForm(forms.Form):  # [2]
     observaciones.widget.attrs['required'] = 'required'
 
     def clean_deposito(self):
-        if self.data['4-deposito'] == '':
+        if self.cleaned_data['deposito'] == '':
             raise forms.ValidationError("Debe colocar el numero del vauche.")
         else:
-            return self.data['4-deposito']
+            return self.cleaned_data['deposito']
 
     def clean_observaciones(self):
-        if self.data['4-observaciones'] == '':
+        if self.cleaned_data['observaciones'] == '':
             raise forms.ValidationError("Debe colocar una(as) observacion(es).")
         else:
-            return self.data['4-observaciones']
+            return self.cleaned_data['observaciones']
 
 
 class EditarContribuyenteForm(forms.ModelForm):
