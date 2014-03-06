@@ -24,7 +24,7 @@ def click_impuesto(ff,id):
 
 
 class ActEconomicaTest(LiveServerTestCase):
-    fixtures=['rubros.json','impuestos.json','ut.json']
+    fixtures=['rubros.json','impuestos.json','ut.json','cuotas.json']
 
     @classmethod
     def setUpClass(cls):
@@ -84,6 +84,9 @@ class ActEconomicaTest(LiveServerTestCase):
         form=EstimadasForm()
         calculo=form._calculo(dict({monto.rubro.codigo:monto.estimado,monto2.rubro.codigo:monto.estimado}),monto.ano)
         self.assertEqual( float(calculado.get_attribute('value')),round(calculo,2))
+        depo=self.selenium.find_element_by_name('4-numero').send_keys('0000')
+        observ=self.selenium.find_element_by_name('4-observaciones').send_keys('0000')
+        self.submit()
 
 
 
