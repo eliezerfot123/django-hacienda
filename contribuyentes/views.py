@@ -160,7 +160,7 @@ class LiquidacionWizard(SessionWizardView):
         vencimiento= datetime.date(datetime.date.today().year,
         datetime.date.today().month,calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1]),
         observaciones=self.get_all_cleaned_data()['observaciones'],
-        liquidador=self.request.user,tipo=tipo),
+        liquidador=self.request.user,tipo=tipo,
         modopago=self.get_all_cleaned_data()['modopago'])
 
         liquidacion.save()
