@@ -190,7 +190,7 @@
 					        </button>
 					        <p>
 					        <i class="icon-info-sign"></i>
-					        Contribuyente ya tiene liquidaciones para el impuesto
+					        Contribuyente tiene cargada
 					            <strong> 
 									{{message}}
 					            </strong> 
@@ -228,7 +228,8 @@
 											<th>Impuesto</th>
 											<th>Recargo</th>
 											<th>Intereses</th>
-											<th>Observaciones</th>
+											<th>Sub-Total</th>
+											<th>Total</th>
 										</tr>
 									</thead>
 
@@ -254,7 +255,8 @@
 												<td>{{ contrib.impuesto }}</td>
 												<td>{{ contrib.recargo }}</td>
 												<td>{{ contrib.intereses }}</td>
-												<td>{{ contrib.liquidacion.observaciones }}</td>
+												<td>{{ contrib.monto }}</td>
+												<td>{{ contrib.cancelado }}</td>
                                                 <td>
 														<a class="blue" href="/reporte/liquidacion/{{contrib.liquidacion.numero }}" title="Ver Liquidacion">
 															<i class="icon-zoom-in bigger-130"></i>
@@ -325,7 +327,7 @@
 			      { "bSortable": false }, null,
 			      { "bSortable": false },
 			      null, null, null, null, null,
-                  null, null, null, null, null
+                  null, null, null, null, null, null
 				] } );
 				
 				

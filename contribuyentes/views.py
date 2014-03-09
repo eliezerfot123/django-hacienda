@@ -132,6 +132,7 @@ class LiquidacionWizard(SessionWizardView):
                     Monto.objects.get_or_create(contribuyente=contribuyente,rubro=rubro,estimado=form.cleaned_data['estimado'][ano][rubroid],ano=ano)
         return self.get_form_step_data(form)
 
+    """Validación de pasos del wizard"""
     def render_next_step(self, form, **kwargs):
         if self.steps.current == '1':
             if self.get_cleaned_data_for_step('1')['tipo_liquidacion'] == 'est':
@@ -139,10 +140,19 @@ class LiquidacionWizard(SessionWizardView):
                 """Validación para comprobar si ya se a creado la estimada"""
                 if filter_liquid:
                     from django.contrib import messages
-                    messages.error(self.request, "%s en el año %s" % (self.get_cleaned_data_for_step('0')['impuesto'], datetime.datetime.today().year))
+                    messages.error(self.request, "liquidación estimada para el impuesto %s en el año %s" % (self.get_cleaned_data_for_step('0')['impuesto'], datetime.datetime.today().year))
+                    return HttpResponseRedirect(reverse('contrib-liquids', args=[self.get_cleaned_data_for_step('0')['contrib'].id]))
+                return super(LiquidacionWizard, self).render_next_step(form, **kwargs)
+
+        if self.steps.current == '1':
+            if self.get_cleaned_data_for_step('1')['tipo_liquidacion'] == 'def':
+                filter_liquid = Liquidacion2.objects.filter(ano=datetime.datetime.today().year, contribuyente=self.get_cleaned_data_for_step('0')['contrib'].id, pago2__impuesto=self.get_cleaned_data_for_step('0')['impuesto'].id, contribuyente__monto__definitivo__isnull=False).exists()
+                """Validación para comprobar si ya tiene definitiva cargada"""
+                if filter_liquid:
+                    from django.contrib import messages
+                    messages.error(self.request, "liquidación definitiva para el impuesto %s en el año %s" % (self.get_cleaned_data_for_step('0')['impuesto'], datetime.datetime.today().year))
                     return HttpResponseRedirect(reverse('contrib-liquids', args=[self.get_cleaned_data_for_step('0')['contrib'].id]))
         return super(LiquidacionWizard, self).render_next_step(form, **kwargs)
-
 
     @transaction.atomic
     def done(self, form_list, **kwargs):
@@ -168,14 +178,15 @@ class LiquidacionWizard(SessionWizardView):
 
         liquidacion.save()
 
-        for ano,rubros in self.get_all_cleaned_data()['rubros'].iteritems():
-            monto=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano,definitivo=None)
-            for montos in rubros:
-                definitiva=monto.filter(rubro__codigo=montos)
-                if definitiva.exists():
-                    definitiva=definitiva[0]
-                    definitiva.definitivo=rubros[montos]
-                    definitiva.save()
+        if self.get_cleaned_data_for_step('1')['tipo_liquidacion'] == 'def':
+            for ano,rubros in self.get_all_cleaned_data()['rubros'].iteritems():
+                monto=Monto.objects.filter(contribuyente=self.get_all_cleaned_data()['contrib'],ano=ano,definitivo=None)
+                for montos in rubros:
+                    definitiva=monto.filter(rubro__codigo=montos)
+                    if definitiva.exists():
+                        definitiva=definitiva[0]
+                        definitiva.definitivo=rubros[montos]
+                        definitiva.save()
 
         for impuesto,pagos in self.get_all_cleaned_data()['trimestre'].iteritems():
             ut=UT.objects.filter(ano=datetime.date.today().year-1)[0]
@@ -195,11 +206,11 @@ class LiquidacionWizard(SessionWizardView):
 
             pago=Pago2(liquidacion=liquidacion,impuesto=impuesto,descuento=pagos['descuento'],monto=pagos['monto'],cancelado=pagos['cancelado'],intereses=pagos['intereses'],recargo=pagos['recargo'],ut=ut,credito_fiscal=pagos['credito'],tipo=tipo)
             pago.save()
-            
+
             for trimestres in range(1,int(pagos['trimestres'])+1):
                cuota=Cuota.objects.get(orden=trimestres,tipo='TRIM')
                pago.trimestres.add(cuota)
-                
+
 
         return render(self.request, 'liquid_cargada.html', {
             'liquid_numero': liquidacion.numero, 'tipo_liquid': self.get_cleaned_data_for_step('1')['tipo_liquidacion'],
